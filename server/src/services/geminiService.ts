@@ -6,7 +6,7 @@
  * CRITICAL ARCHITECTURAL GUARANTEES:
  * 1. AQI, category, and CO₂ savings numbers are NEVER computed by Gemini.
  *    They are computed deterministically before this service is called.
- * 2. System prompt instructs the model to NEVER recalculate or alter numbers.
+ * 2. System prompt instructs the model to strictly ground responses in the provided snapshot.
  * 3. Structured JSON generation is enforced via responseMimeType.
  * 4. Advice responses are cached in-memory per snapshot hash to save quota.
  * 5. If GEMINI_API_KEY is not set or API fails, an ultra-specific deterministic fallback
@@ -29,8 +29,8 @@ const adviceCache = new Map<string, { data: AdviceResponse; expiresAt: number }>
 const ADVICE_CACHE_TTL_MS = 15 * 60 * 1000;
 
 function computeCacheKey(req: AdviceRequest): string {
-  const roles = req.familyProfile.members.map((m) => m.role).sort().join(",");
-  const routines = req.routineChoices.map((r) => r.activityType).sort().join(",");
+  const roles = (req.familyProfile?.members || []).map((m) => m.role).sort().join(",");
+  const routines = (req.routineChoices || []).map((r) => r.activityType).sort().join(",");
   return `${req.aqiSnapshot.city}:${req.aqiSnapshot.category}:${req.aqiSnapshot.aqi}:${roles}:${routines}`;
 }
 
@@ -45,6 +45,10 @@ export async function generateAdviceWording(
   if (cached && cached.expiresAt > now) {
     return cached.data;
   }
+
+  // Handle boundary state of empty members
+  const members = request.familyProfile?.members || [];
+  const routines = request.routineChoices || [];
 
   // If no Gemini key is provided, use reliable hyper-specific fallback
   if (!env.GEMINI_API_KEY || env.GEMINI_API_KEY === "your_gemini_api_key_here") {
@@ -63,30 +67,47 @@ export async function generateAdviceWording(
       },
     });
 
-    const prompt = `
-You are an expert, family-focused urban air quality and environmental health specialist tailored for Indian metropolitan and tier-2 households.
-You provide highly concrete, actionable, time-slotted routines and indoor air quality recommendations.
+    const subIndicesSummary = (request.aqiSnapshot.pollutants || [])
+      .map((p) => `${p.pollutant}: ${p.subIndex ?? "N/A"} (${p.concentration ?? "N/A"} ${p.unit})`)
+      .join(", ");
 
-CRITICAL INSTRUCTIONS:
-1. Do NOT recalculate or invent any AQI, pollutant concentration, or CO₂ figures.
-2. The AQI is ALREADY computed as ${request.aqiSnapshot.aqi} (${request.aqiSnapshot.category}) with prominent pollutant: ${request.aqiSnapshot.prominentPollutant}.
-3. The CO₂ saved per day is ALREADY computed as ${co2Estimate.savedKgPerDay} kg/day (${co2Estimate.savedKgPerYear} kg/yr).
-4. Do NOT output generic platitudes (e.g., "stay indoors"). Be hyper-specific:
-   - Provide concrete time windows for outdoor exposure vs. staying indoors in ${request.aqiSnapshot.city}.
-   - Distinguish biological physiological risks: why an infant, senior, or asthmatic requires a stricter exposure threshold than a healthy adult at AQI ${request.aqiSnapshot.aqi}.
-   - Directly reference the prominent pollutant (${request.aqiSnapshot.prominentPollutant}) and explain its specific biological penetration (e.g., PM2.5 alveolar absorption vs. Ozone epithelial irritation).
-   - Detail commute trade-offs based on the user's specific routine modes (${request.routineChoices.map(r => r.activityType).join(", ")}).
-5. Output MUST be valid JSON adhering strictly to this schema:
+    const prompt = `
+You are an expert, family-focused urban air quality and environmental health specialist tailored for Indian households.
+You provide highly concrete, supportive, non-prescriptive, time-slotted routines and indoor air quality recommendations.
+
+CRITICAL GROUNDING INSTRUCTIONS:
+1. STRICT LOCALITY GROUNDING: The active locality is ONLY "${request.aqiSnapshot.city}". Do NOT mention or substitute any other city, district, or state.
+2. STRICT AQI GROUNDING: The National AQI is ALREADY computed deterministically via CPCB breakpoints as ${request.aqiSnapshot.aqi} (${request.aqiSnapshot.category}). Do NOT cite, alter, or recalculate any other AQI score.
+3. DOMINANT POLLUTANT: The prominent driver is ${request.aqiSnapshot.prominentPollutant}.
+   Sub-indices across criteria pollutants: ${subIndicesSummary || "Standard 6-parameter monitoring"}.
+4. DETERMINISTIC CO₂ METRICS:
+   - Solo car baseline: ${co2Estimate.baselineKgPerDay} kg/day
+   - Commute footprint: ${co2Estimate.optimisedKgPerDay} kg/day
+   - Daily carbon saved: ${co2Estimate.savedKgPerDay} kg/day (${co2Estimate.savedKgPerYear} kg/year)
+   - Annual tree sequestration: ${co2Estimate.annualTreeYears ?? (co2Estimate.savedKgPerYear / 21).toFixed(1)} tree-years/yr
+   Do NOT recalculate or invent any carbon numbers.
+5. HOUSEHOLD MEMBERS:
+   You MUST generate personalized guidance for EACH member listed below:
+   ${members.map((m) => `- ID: "${m.id}", Name: "${m.name}", Role: "${m.role}"`).join("\n") || "No members provided."}
+   Use supportive, non-prescriptive phrasing. Distinguish physiological vulnerability:
+   - Infants / Children: rapid cadence, lung alveoli development, peak exposure hours.
+   - Seniors / Cardiac / Asthmatic: systemic vascular oxidative stress, airway hyper-reactivity, indoor buffer zones.
+   - Healthy Adults: endurance limits, mucosal protection, post-commute recovery without alarming phrasing.
+6. COMMUTE MODES:
+   Active commute legs: ${routines.map((r) => `${r.activityType} (${r.durationMinutes} min, ${r.distanceKm ?? "auto"} km)`).join("; ") || "None configured"}.
+   Detail exposure avoidance strategies for their specific modes.
+
+Output MUST be valid JSON adhering strictly to this schema:
 {
   "memberAdvice": [
     {
-      "memberId": "string matching input member id",
-      "memberName": "string matching input member name",
-      "healthImpact": "detailed, medically grounded explanation of why this specific age/condition is uniquely vulnerable at AQI ${request.aqiSnapshot.aqi} (${request.aqiSnapshot.category}) dominated by ${request.aqiSnapshot.prominentPollutant}",
+      "memberId": "exact string matching input member id",
+      "memberName": "exact string matching input member name",
+      "healthImpact": "supportive, physiological explanation tailored to ${request.aqiSnapshot.city}'s AQI ${request.aqiSnapshot.aqi} (${request.aqiSnapshot.category}) dominated by ${request.aqiSnapshot.prominentPollutant}",
       "personalTips": [
-        "Time-slotted actionable precaution (e.g. window timing, mask specification, hydration)",
+        "Time-slotted actionable precaution (e.g. morning window timing, mask specification, hydration)",
         "Specific indoor / medication buffer recommendation",
-        "Actionable mitigation for daily transit or physical exertion"
+        "Practical mitigation for daily transit or physical exertion"
       ]
     }
   ],
@@ -102,15 +123,19 @@ CRITICAL INSTRUCTIONS:
   ]
 }
 
-INPUT DATA:
+SNAPSHOT DATA:
 ${JSON.stringify(
   {
-    city: request.aqiSnapshot.city,
+    locality: request.aqiSnapshot.city,
+    lat: request.aqiSnapshot.lat,
+    lon: request.aqiSnapshot.lon,
     aqi: request.aqiSnapshot.aqi,
     category: request.aqiSnapshot.category,
     prominentPollutant: request.aqiSnapshot.prominentPollutant,
-    familyMembers: request.familyProfile.members,
-    routineChoices: request.routineChoices,
+    subIndices: request.aqiSnapshot.pollutants,
+    householdMembers: members,
+    commuteLegs: routines,
+    co2Metrics: co2Estimate,
     indoorContext: request.indoorContext,
   },
   null,
@@ -148,9 +173,15 @@ export function generateDeterministicFallback(
   co2Estimate: AdviceResponse["co2Estimate"]
 ): AdviceResponse {
   const { city, aqi, category, prominentPollutant } = req.aqiSnapshot;
-  const prominentDisplay = prominentPollutant === "pm2_5" ? "PM₂.₅ fine micro-particles" : prominentPollutant.toUpperCase();
+  const prominentDisplay =
+    prominentPollutant === "pm2_5"
+      ? "PM₂.₅ fine micro-particles"
+      : prominentPollutant.toUpperCase();
 
-  const memberAdvice: MemberAdvice[] = req.familyProfile.members.map((m) => {
+  const members = req.familyProfile?.members || [];
+  const routines = req.routineChoices || [];
+
+  const memberAdvice: MemberAdvice[] = members.map((m) => {
     let healthImpact = "";
     const personalTips: string[] = [];
 
@@ -221,10 +252,13 @@ export function generateDeterministicFallback(
     };
   });
 
+  const totalCarbonSavings = co2Estimate.savedKgPerDay;
   const routineSuggestions: string[] = [
     `Commute Window Buffer: Shift departures in ${city} 30 minutes earlier or later to avoid peak rush hours (8:00–9:30 AM and 7:00–8:30 PM) when tailpipe emissions surge.`,
-    `Transit Exposure Shield: Shifting from open road transit to Metro or rail reduces personal toxic fine particulate exposure by up to 65% per trip.`,
-    `Quantified Impact: Your family's low-emission routine slashes carbon output by ${co2Estimate.savedKgPerDay} kg CO₂/day (saving ${co2Estimate.savedKgPerYear.toFixed(0)} kg annually)!`,
+    `Transit Exposure Shield: Shifting from open road transit to Metro or electric rail reduces personal toxic fine particulate exposure by up to 65% per trip.`,
+    totalCarbonSavings > 0
+      ? `Quantified Impact: Your family's low-emission routine slashes carbon output by ${co2Estimate.savedKgPerDay} kg CO₂/day (saving ${co2Estimate.savedKgPerYear.toFixed(0)} kg annually)!`
+      : "Active Route Optimization: Combine daily errands to minimize roadside exposure along high-traffic corridors.",
   ];
 
   const indoorTips: string[] = [

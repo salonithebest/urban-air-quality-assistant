@@ -5,10 +5,12 @@ import type {
   RoutineChoice,
   IndoorContext,
   AdviceResponse,
+  AdviceInputSnapshot,
 } from "../types/index.js";
 
 export function useGeminiAdvice() {
   const [advice, setAdvice] = useState<AdviceResponse | null>(null);
+  const [lastGeneratedSnapshot, setLastGeneratedSnapshot] = useState<AdviceInputSnapshot | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -50,6 +52,20 @@ export function useGeminiAdvice() {
 
         const data = (await res.json()) as AdviceResponse;
         setAdvice(data);
+
+        // Save immutable snapshot of exact inputs used to generate this plan
+        setLastGeneratedSnapshot({
+          city: aqiSnapshot.city,
+          lat: aqiSnapshot.lat,
+          lon: aqiSnapshot.lon,
+          aqi: aqiSnapshot.aqi,
+          category: aqiSnapshot.category,
+          prominentPollutant: aqiSnapshot.prominentPollutant,
+          pollutants: [...aqiSnapshot.pollutants],
+          members: familyMembers.map((m) => ({ ...m })),
+          routineChoices: routineChoices.map((r) => ({ ...r })),
+          generatedAt: new Date().toISOString(),
+        });
       } catch (err: unknown) {
         setError(err instanceof Error ? err.message : "Failed to generate personalized advice");
       } finally {
@@ -59,5 +75,11 @@ export function useGeminiAdvice() {
     []
   );
 
-  return { advice, loading, error, getAdvice };
+  const clearAdvice = useCallback(() => {
+    setAdvice(null);
+    setLastGeneratedSnapshot(null);
+    setError(null);
+  }, []);
+
+  return { advice, lastGeneratedSnapshot, loading, error, getAdvice, clearAdvice };
 }

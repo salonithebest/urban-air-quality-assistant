@@ -49,7 +49,10 @@ export const DimensionalPentagon: React.FC<DimensionalPentagonProps> = ({
   const dataPolygonPoints = vertices
     .map((v) => {
       const reading = pollutants.find((p) => p.pollutant === v.id);
-      const subIndex = reading ? reading.subIndex : 50;
+      const subIndex =
+        reading && typeof reading.subIndex === "number" && !isNaN(reading.subIndex)
+          ? reading.subIndex
+          : 50;
       const rScale = 35 + Math.min(95, (subIndex / 500) * 95);
       const rad = (v.angle * Math.PI) / 180;
       const x = cx + rScale * Math.cos(rad);
@@ -248,7 +251,10 @@ export const DimensionalPentagon: React.FC<DimensionalPentagonProps> = ({
             {/* Interactive Outer Node Pills */}
             {outerCoords.map((v) => {
               const reading = pollutants.find((p) => p.pollutant === v.id);
-              const subIndex = reading ? reading.subIndex : 0;
+              const subIndex =
+                reading && typeof reading.subIndex === "number" && !isNaN(reading.subIndex)
+                  ? reading.subIndex
+                  : "—";
               const isProminent = v.id === prominentPollutant;
 
               return (

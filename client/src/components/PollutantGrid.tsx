@@ -17,7 +17,7 @@ export const PollutantGrid: React.FC<PollutantGridProps> = ({ pollutants }) => {
             CPCB Pollutant Concentrations &amp; Sub-Indices
           </h3>
           <span className="text-[11px] bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 px-2.5 py-0.5 rounded-full font-bold">
-            6 Parameters
+            {pollutants.length} Parameters
           </span>
         </div>
 
@@ -30,6 +30,14 @@ export const PollutantGrid: React.FC<PollutantGridProps> = ({ pollutants }) => {
         {pollutants.map((p) => {
           const theme = AQI_CATEGORY_THEMES[p.category] || AQI_CATEGORY_THEMES["Moderately Polluted"];
           const name = POLLUTANT_NAMES[p.pollutant] || p.pollutant;
+          const displayConc =
+            p.concentration !== null && p.concentration !== undefined && !isNaN(p.concentration)
+              ? p.concentration.toFixed(1)
+              : "N/A";
+          const displaySubIndex =
+            p.subIndex !== null && p.subIndex !== undefined && !isNaN(p.subIndex)
+              ? p.subIndex
+              : "—";
 
           return (
             <div
@@ -50,7 +58,7 @@ export const PollutantGrid: React.FC<PollutantGridProps> = ({ pollutants }) => {
                 <div className="mt-2 flex items-baseline justify-between">
                   <div>
                     <div className="text-2xl sm:text-3xl font-black text-white tracking-tight">
-                      {p.concentration.toFixed(1)}
+                      {displayConc}
                     </div>
                     <div className="text-[10px] text-slate-400 font-medium">
                       {p.unit}
@@ -62,7 +70,7 @@ export const PollutantGrid: React.FC<PollutantGridProps> = ({ pollutants }) => {
                       className="text-base font-black"
                       style={{ color: theme.accent }}
                     >
-                      {p.subIndex}
+                      {displaySubIndex}
                     </div>
                     <div className="text-[9px] text-slate-400 uppercase font-bold tracking-wider">
                       Sub-Index

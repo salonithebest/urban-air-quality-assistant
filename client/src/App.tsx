@@ -16,13 +16,13 @@ import { IndoorTipsPanel } from "./components/IndoorTipsPanel.js";
 import { Co2SavingsWidget } from "./components/Co2SavingsWidget.js";
 import { AqiCardFooter } from "./components/AqiCardFooter.js";
 
-import { Sparkles, Loader2, RefreshCw, Shield } from "lucide-react";
+import { Sparkles, Loader2, RefreshCw, Shield, AlertTriangle, CheckCircle2 } from "lucide-react";
 
 export const App: React.FC = () => {
   // Start with Surat (as requested by user)
   const [selectedCity, setSelectedCity] = useState<City>(INDIAN_CITIES[0]!);
 
-  // Default routine choices
+  // Default routine choices: 50 min total, 15.0 km active transit
   const [routineChoices, setRoutineChoices] = useState<RoutineChoice[]>([
     { activityType: "metro", durationMinutes: 35, distanceKm: 14 },
     { activityType: "walk", durationMinutes: 15, distanceKm: 1 },
@@ -31,10 +31,21 @@ export const App: React.FC = () => {
   // Data hooks
   const { data: aqiData, loading: aqiLoading, error: aqiError, refetch } = useAirQuality(selectedCity);
   const { members, addMember, removeMember } = useFamilyProfile();
-  const { advice, loading: adviceLoading, error: adviceError, getAdvice } = useGeminiAdvice();
+  const { advice, lastGeneratedSnapshot, loading: adviceLoading, error: adviceError, getAdvice } = useGeminiAdvice();
+
+  // Detect whether the currently rendered advice is stale / out of sync with current session inputs
+  const isPlanOutOfSync = Boolean(
+    advice &&
+      lastGeneratedSnapshot &&
+      (lastGeneratedSnapshot.city.toLowerCase() !== selectedCity.name.toLowerCase() ||
+        lastGeneratedSnapshot.aqi !== aqiData?.aqi ||
+        JSON.stringify(lastGeneratedSnapshot.members) !== JSON.stringify(members) ||
+        JSON.stringify(lastGeneratedSnapshot.routineChoices) !== JSON.stringify(routineChoices))
+  );
 
   const handleGenerateAdvice = () => {
     if (!aqiData) return;
+    if (members.length === 0) return;
     getAdvice(aqiData, members, routineChoices);
   };
 
@@ -69,7 +80,7 @@ export const App: React.FC = () => {
             <button
               onClick={refetch}
               disabled={aqiLoading}
-              className="px-4 py-2.5 bg-slate-900/90 border border-emerald-500/30 hover:border-emerald-500 text-white hover:text-emerald-300 text-xs font-black rounded-xl flex items-center gap-2 transition-all active:scale-95 shadow-lg shadow-black/40"
+              className="px-4 py-2.5 bg-slate-900/90 border border-emerald-500/30 hover:border-emerald-500 text-white hover:text-emerald-300 text-xs font-black rounded-xl flex items-center gap-2 transition-all active:scale-95 shadow-lg shadow-black/40 cursor-pointer"
               title="Refresh live atmospheric data"
             >
               <RefreshCw className={`w-3.5 h-3.5 text-emerald-400 ${aqiLoading ? "animate-spin" : ""}`} />
@@ -90,7 +101,7 @@ export const App: React.FC = () => {
           <div className="cyber-panel rounded-3xl p-14 text-center mb-6 flex flex-col items-center justify-center border border-emerald-500/20">
             <Loader2 className="w-10 h-10 text-emerald-400 animate-spin mb-3" />
             <p className="font-black text-white text-lg">Fetching live atmospheric models from Open-Meteo...</p>
-            <p className="text-xs text-slate-400 mt-1">Executing CPCB segmented linear sub-index interpolation</p>
+            <p className="text-xs text-slate-400 mt-1">Executing CPCB segmented linear sub-index interpolation for {selectedCity.name}</p>
           </div>
         )}
 
@@ -131,11 +142,19 @@ export const App: React.FC = () => {
             members={members}
             onAddMember={addMember}
             onRemoveMember={removeMember}
+            activeAqi={aqiData?.aqi}
+            activeCategory={aqiData?.category}
+            activeProminentPollutant={aqiData?.prominentPollutant}
           />
           <RoutinePanel
             choices={routineChoices}
             onChangeChoices={setRoutineChoices}
           />
+        </div>
+
+        {/* Real-time Deterministic Commute CO₂ Engine (Live sync with RoutinePanel) */}
+        <div className="mb-6">
+          <Co2SavingsWidget routineChoices={routineChoices} />
         </div>
 
         {/* Advice CTA Action Banner */}
@@ -154,14 +173,20 @@ export const App: React.FC = () => {
                 Synthesize Personalized Family Protocol
               </h3>
               <p className="text-xs text-slate-300 mt-1.5 max-w-xl leading-relaxed">
-                Grounds Gemini 2.0 Flash in your household's vulnerable conditions, {selectedCity.name}’s calculated AQI ({aqiData.aqi} - {aqiData.category}), and chosen commute legs to output time-slotted routines and indoor air safeguards.
+                Grounds Gemini 2.0 Flash strictly in {selectedCity.name}’s calculated CPCB AQI ({aqiData.aqi} - {aqiData.category}), prominent driver ({aqiData.prominentPollutant.toUpperCase()}), {members.length} family profiles, and low-emission commute legs.
               </p>
+
+              {members.length === 0 && (
+                <p className="text-xs text-amber-300 mt-2 font-semibold">
+                  ⚠️ Please add at least one household member above before generating your action plan.
+                </p>
+              )}
             </div>
 
             <button
               onClick={handleGenerateAdvice}
-              disabled={adviceLoading}
-              className="relative z-10 w-full md:w-auto px-8 py-4 bg-emerald-400 hover:bg-emerald-300 disabled:opacity-50 font-black text-sm text-slate-950 rounded-2xl shadow-xl shadow-emerald-500/30 flex items-center justify-center gap-2.5 shrink-0 transition-all active:scale-95 cursor-pointer"
+              disabled={adviceLoading || members.length === 0}
+              className="relative z-10 w-full md:w-auto px-8 py-4 bg-emerald-400 hover:bg-emerald-300 disabled:opacity-40 disabled:cursor-not-allowed font-black text-sm text-slate-950 rounded-2xl shadow-xl shadow-emerald-500/30 flex items-center justify-center gap-2.5 shrink-0 transition-all active:scale-95 cursor-pointer"
             >
               {adviceLoading ? (
                 <>
@@ -171,7 +196,7 @@ export const App: React.FC = () => {
               ) : (
                 <>
                   <Sparkles className="w-4 h-4 text-slate-950" />
-                  <span>Get Family Action Plan</span>
+                  <span>{advice ? "Re-synthesize Action Plan" : "Get Family Action Plan"}</span>
                 </>
               )}
             </button>
@@ -186,21 +211,57 @@ export const App: React.FC = () => {
           </div>
         )}
 
+        {/* Out-of-Sync Indicator Banner */}
+        {isPlanOutOfSync && lastGeneratedSnapshot && (
+          <div className="bg-amber-500/15 border-2 border-amber-500/60 rounded-3xl p-5 sm:p-6 mb-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-xl">
+            <div className="flex items-start gap-3.5">
+              <div className="p-2 rounded-xl bg-amber-500/20 text-amber-300 shrink-0 mt-0.5">
+                <AlertTriangle className="w-5 h-5" />
+              </div>
+              <div>
+                <span className="font-black text-amber-300 text-sm sm:text-base block">
+                  Action Plan Out of Sync with Current Session Inputs
+                </span>
+                <p className="text-xs text-slate-200 mt-1 leading-relaxed">
+                  The protocol below was generated for <strong>{lastGeneratedSnapshot.city}</strong> (AQI {lastGeneratedSnapshot.aqi}), but your current active inputs are <strong>{selectedCity.name}</strong> (AQI {aqiData?.aqi ?? "..."}) with {members.length} members and {routineChoices.length} commute legs. Click Refresh to regenerate.
+                </p>
+              </div>
+            </div>
+
+            <button
+              onClick={handleGenerateAdvice}
+              disabled={adviceLoading || members.length === 0}
+              className="px-5 py-2.5 bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs rounded-xl flex items-center gap-2 shrink-0 transition-all active:scale-95 shadow-md cursor-pointer self-stretch md:self-auto justify-center"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${adviceLoading ? "animate-spin" : ""}`} />
+              <span>Update Plan Now</span>
+            </button>
+          </div>
+        )}
+
         {/* AI Action Plan Results */}
         {advice && (
           <div className="mt-8 pt-6 border-t border-slate-800 space-y-6">
-            <div className="flex items-center gap-2.5">
-              <span className="relative flex h-3 w-3">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500" />
-              </span>
-              <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
-                Personalized Family Action Plan
-              </h2>
-            </div>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="flex items-center gap-2.5">
+                <span className="relative flex h-3 w-3">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500" />
+                </span>
+                <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+                  Personalized Family Action Plan
+                </h2>
+              </div>
 
-            {/* Deterministic CO2 Savings */}
-            <Co2SavingsWidget co2Estimate={advice.co2Estimate} />
+              {lastGeneratedSnapshot && (
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900 border border-slate-700 text-slate-300 text-[11px] font-semibold">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>
+                    Synchronized with <strong>{lastGeneratedSnapshot.city}</strong> (AQI {lastGeneratedSnapshot.aqi}) • {lastGeneratedSnapshot.members.length} Profiles
+                  </span>
+                </div>
+              )}
+            </div>
 
             {/* Individual Family Member Protocols */}
             <FamilyAdviceSection memberAdvice={advice.memberAdvice} />

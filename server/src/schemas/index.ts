@@ -176,6 +176,8 @@ export const Co2EstimateSchema = z.object({
   savedKgPerDay: z.number(),
   savedKgPerYear: z.number(),
   equivalentTreeDays: z.number(),
+  annualTreeYears: z.number().optional(),
+  percentReduction: z.number().optional(),
   sourceLabel: z.string(),
 });
 export type Co2Estimate = z.infer<typeof Co2EstimateSchema>;

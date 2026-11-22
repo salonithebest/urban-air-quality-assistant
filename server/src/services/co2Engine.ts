@@ -7,7 +7,7 @@
  *  1. Computes a "baseline" — what the user would emit if they drove
  *     the same total distance by car.
  *  2. Computes the actual CO₂ for the chosen mix of modes.
- *  3. Returns savings: kg saved per day, per year, and tree-day equivalent.
+ *  3. Returns savings: kg saved per day, per year, tree-years, and tree-day equivalent.
  *
  * All values are approximate — see emissionFactors.ts for sourcing notes.
  * No I/O, no network calls, no side effects.
@@ -25,14 +25,16 @@ import type { Co2Estimate, RoutineChoice } from "../schemas/index.js";
 
 /**
  * Estimate distance from duration if distanceKm is not provided.
- * Uses a rough average speed per mode.
+ * Uses a rough average speed per mode in urban India.
  */
 function estimateDistanceKm(
   activityType: string,
   durationMinutes: number
 ): number {
+  if (activityType === "wfh") return 0;
+
   const avgSpeedKmPerHour: Record<string, number> = {
-    car: 25,          // urban Indian traffic average
+    car: 25, // urban Indian traffic average
     bike: 30,
     autorickshaw: 20,
     metro: 35,
@@ -40,7 +42,7 @@ function estimateDistanceKm(
     wfh: 0,
   };
   const speed = avgSpeedKmPerHour[activityType] ?? 0;
-  return (speed * durationMinutes) / 60;
+  return (speed * Math.max(0, durationMinutes)) / 60;
 }
 
 // ---------------------------------------------------------------------------
@@ -54,41 +56,64 @@ function estimateDistanceKm(
  * @returns Co2Estimate object with baseline, optimised, and savings values
  */
 export function estimateCo2(choices: RoutineChoice[]): Co2Estimate {
+  if (!choices || choices.length === 0) {
+    return {
+      baselineKgPerDay: 0,
+      optimisedKgPerDay: 0,
+      savedKgPerDay: 0,
+      savedKgPerYear: 0,
+      annualTreeYears: 0,
+      equivalentTreeDays: 0,
+      percentReduction: 0,
+      sourceLabel: "Zero commute baseline",
+    };
+  }
+
   let baselineKgPerDay = 0;
   let optimisedKgPerDay = 0;
 
   for (const choice of choices) {
-    const distanceKm =
-      choice.distanceKm !== undefined && choice.distanceKm > 0
-        ? choice.distanceKm
-        : estimateDistanceKm(choice.activityType, choice.durationMinutes);
+    const isWfh = choice.activityType === "wfh";
+    const mins = Math.max(0, choice.durationMinutes || 0);
 
-    // Baseline: what would the same journey cost by car?
-    const carFactor = EMISSION_FACTORS["car"]?.kgPerKm ?? 0.14;
-    baselineKgPerDay += distanceKm * carFactor;
+    // WFH strictly generates 0 km transit distance
+    const distanceKm = isWfh
+      ? 0
+      : choice.distanceKm !== undefined && choice.distanceKm >= 0
+      ? choice.distanceKm
+      : estimateDistanceKm(choice.activityType, mins);
 
-    // Actual: chosen mode's emission factor
-    const factor = EMISSION_FACTORS[choice.activityType];
-    const actualFactor = factor?.kgPerKm ?? 0;
-    optimisedKgPerDay += distanceKm * actualFactor;
+    if (!isWfh) {
+      // Baseline: what would the same journey cost by solo petrol car?
+      const carFactor = EMISSION_FACTORS["car"]?.kgPerKm ?? 0.14;
+      baselineKgPerDay += distanceKm * carFactor;
+
+      // Actual: chosen mode's emission factor
+      const factor = EMISSION_FACTORS[choice.activityType];
+      const actualFactor = factor?.kgPerKm ?? 0;
+      optimisedKgPerDay += distanceKm * actualFactor;
+    }
   }
 
   const savedKgPerDay = Math.max(0, baselineKgPerDay - optimisedKgPerDay);
   const savedKgPerYear = savedKgPerDay * 365;
-  const equivalentTreeDays =
-    KG_CO2_PER_TREE_PER_YEAR > 0
-      ? (savedKgPerYear / KG_CO2_PER_TREE_PER_YEAR) * 365
-      : 0;
+  const annualTreeYears =
+    KG_CO2_PER_TREE_PER_YEAR > 0 ? savedKgPerYear / KG_CO2_PER_TREE_PER_YEAR : 0;
+  const equivalentTreeDays = annualTreeYears * 365;
+  const percentReduction =
+    baselineKgPerDay > 0 ? Math.min(100, (savedKgPerDay / baselineKgPerDay) * 100) : 0;
 
   // Build a source label from the unique sources used
   const usedSources = new Set<string>();
   for (const choice of choices) {
-    const factor = EMISSION_FACTORS[choice.activityType];
-    if (factor && factor.source !== "—") usedSources.add(factor.source);
+    if (choice.activityType !== "wfh") {
+      const factor = EMISSION_FACTORS[choice.activityType];
+      if (factor && factor.source !== "—") usedSources.add(factor.source);
+    }
   }
-  // Always include car baseline source
+  // Always include car baseline source if there was active travel
   const carSource = EMISSION_FACTORS["car"]?.source;
-  if (carSource) usedSources.add(carSource);
+  if (carSource && baselineKgPerDay > 0) usedSources.add(carSource);
 
   const sourceLabel =
     usedSources.size > 0
@@ -100,7 +125,9 @@ export function estimateCo2(choices: RoutineChoice[]): Co2Estimate {
     optimisedKgPerDay: round2(optimisedKgPerDay),
     savedKgPerDay: round2(savedKgPerDay),
     savedKgPerYear: round2(savedKgPerYear),
+    annualTreeYears: round2(annualTreeYears),
     equivalentTreeDays: round2(equivalentTreeDays),
+    percentReduction: Math.round(percentReduction),
     sourceLabel,
   };
 }

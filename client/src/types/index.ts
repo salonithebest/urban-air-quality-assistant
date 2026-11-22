@@ -73,7 +73,22 @@ export interface Co2Estimate {
   savedKgPerDay: number;
   savedKgPerYear: number;
   equivalentTreeDays: number;
+  annualTreeYears?: number;
+  percentReduction?: number;
   sourceLabel: string;
+}
+
+export interface AdviceInputSnapshot {
+  city: string;
+  lat: number;
+  lon: number;
+  aqi: number;
+  category: Category;
+  prominentPollutant: PollutantId;
+  pollutants: PollutantReading[];
+  members: FamilyMember[];
+  routineChoices: RoutineChoice[];
+  generatedAt: string;
 }
 
 export interface MemberAdvice {
