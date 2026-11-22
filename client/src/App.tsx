@@ -15,7 +15,7 @@ import { IndoorTipsPanel } from "./components/IndoorTipsPanel.js";
 import { Co2SavingsWidget } from "./components/Co2SavingsWidget.js";
 import { AqiCardFooter } from "./components/AqiCardFooter.js";
 
-import { Sparkles, Loader2, RefreshCw } from "lucide-react";
+import { Sparkles, Loader2, RefreshCw, Shield, Award } from "lucide-react";
 
 export const App: React.FC = () => {
   // Start with Surat (as requested by user)
@@ -38,57 +38,69 @@ export const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col justify-between">
-      <div className="max-w-6xl mx-auto px-4 py-8 w-full">
-        {/* Header */}
-        <header className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div className="min-h-screen text-slate-100 flex flex-col justify-between selection:bg-emerald-500/30 selection:text-emerald-200">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-10 w-full">
+        {/* Header Bar */}
+        <header className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-5 border-b border-white/10 pb-6">
           <div>
-            <div className="flex items-center gap-2">
-              <span className="w-3 h-3 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="text-xs font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="relative flex h-2.5 w-2.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500" />
+              </span>
+              <span className="text-[11px] font-black uppercase tracking-widest text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/25">
                 Google PromptWars 06
               </span>
+              <span className="text-[11px] font-bold text-slate-400 bg-white/5 px-2.5 py-1 rounded-full border border-white/10 hidden sm:inline-block">
+                CPCB National AQI Standard
+              </span>
             </div>
-            <h1 className="text-3xl font-black text-slate-900 tracking-tight mt-1">
+
+            <h1 className="text-3xl sm:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-slate-400 tracking-tight">
               Urban Air Quality Assistant
             </h1>
-            <p className="text-sm text-slate-500 mt-0.5">
-              Family-focused health planner, CPCB national index, and low-emission routine optimizer.
+            <p className="text-xs sm:text-sm text-slate-400 mt-1 max-w-2xl leading-relaxed">
+              Family-centered urban air health planner for Indian cities with verified CPCB breakpoint interpolation &amp; deterministic carbon reduction.
             </p>
           </div>
 
-          <div className="flex items-center gap-2 self-start sm:self-auto">
+          <div className="flex items-center gap-2.5 self-start sm:self-auto shrink-0">
             <button
               onClick={refetch}
               disabled={aqiLoading}
-              className="p-2.5 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 text-slate-700 text-xs font-medium flex items-center gap-1.5 shadow-sm transition-all"
-              title="Refresh live data"
+              className="px-4 py-2.5 glass-card rounded-2xl hover:border-emerald-500/40 text-slate-200 text-xs font-bold flex items-center gap-2 transition-all active:scale-95 shadow-sm"
+              title="Refresh live atmospheric data"
             >
-              <RefreshCw className={`w-4 h-4 ${aqiLoading ? "animate-spin" : ""}`} />
-              <span className="hidden sm:inline">Refresh Data</span>
+              <RefreshCw className={`w-3.5 h-3.5 text-emerald-400 ${aqiLoading ? "animate-spin" : ""}`} />
+              <span>{aqiLoading ? "Syncing..." : "Refresh Atmosphere"}</span>
             </button>
           </div>
         </header>
 
-        {/* City Selector */}
+        {/* City / Locality Selector with Live Geocoding */}
         <CitySelector
           selectedCity={selectedCity}
           onSelectCity={setSelectedCity}
           isLoading={aqiLoading}
         />
 
-        {/* Live AQI Error/Loading State */}
+        {/* Live Loading State */}
         {aqiLoading && !aqiData && (
-          <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center shadow-sm mb-6 flex flex-col items-center justify-center">
-            <Loader2 className="w-8 h-8 text-emerald-600 animate-spin mb-3" />
-            <p className="font-semibold text-slate-700">Fetching live atmosphere data from Open-Meteo...</p>
-            <p className="text-xs text-slate-400 mt-1">Applying CPCB linear sub-index interpolation formulas</p>
+          <div className="glass-panel rounded-3xl p-14 text-center mb-6 flex flex-col items-center justify-center animate-pulse">
+            <Loader2 className="w-10 h-10 text-emerald-400 animate-spin mb-4" />
+            <p className="font-extrabold text-slate-100 text-lg">Fetching live atmospheric models from Open-Meteo...</p>
+            <p className="text-xs text-slate-400 mt-1">Executing CPCB segmented linear sub-index interpolation</p>
           </div>
         )}
 
+        {/* Error Alert */}
         {aqiError && (
-          <div className="bg-rose-50 border border-rose-200 text-rose-800 rounded-2xl p-4 text-sm mb-6">
-            <strong>Unable to load air data:</strong> {aqiError}
+          <div className="glass-panel border-rose-500/40 bg-rose-950/40 text-rose-200 rounded-3xl p-5 text-xs sm:text-sm mb-6 flex items-start gap-3">
+            <Shield className="w-5 h-5 text-rose-400 shrink-0 mt-0.5" />
+            <div>
+              <strong className="font-bold text-white block mb-0.5">Atmospheric Sync Notice:</strong>
+              {aqiError}
+            </div>
           </div>
         )}
 
@@ -100,7 +112,7 @@ export const App: React.FC = () => {
           </>
         )}
 
-        {/* Family & Routine Planner Inputs */}
+        {/* Family & Routine Inputs */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
           <FamilyProfileForm
             members={members}
@@ -113,60 +125,80 @@ export const App: React.FC = () => {
           />
         </div>
 
-        {/* Advice Generator Call-To-Action */}
+        {/* Advice CTA Action Card */}
         {aqiData && (
-          <div className="bg-gradient-to-r from-emerald-600 to-teal-700 rounded-2xl p-6 shadow-md text-white mb-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div>
-              <h3 className="font-extrabold text-xl flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-amber-300" />
-                Generate Family Impact & Routine Advice
+          <div className="glass-panel-glow rounded-3xl p-6 sm:p-7 text-white mb-6 flex flex-col md:flex-row items-center justify-between gap-5 relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-80 h-32 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+
+            <div className="relative z-10 flex-1">
+              <div className="flex items-center gap-2 mb-1.5">
+                <span className="p-1 rounded-lg bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                  <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                </span>
+                <span className="text-[11px] font-black uppercase tracking-widest text-indigo-300">
+                  AI-Powered Family Intelligence
+                </span>
+              </div>
+              <h3 className="font-black text-xl sm:text-2xl text-white tracking-tight">
+                Synthesize Personalized Family Protocol
               </h3>
-              <p className="text-xs text-emerald-100 mt-1 max-w-xl">
-                Synthesizes Gemini 2.0 Flash with your family’s ages/conditions, calculated AQI ({aqiData.aqi}), and low-emission commute choices.
+              <p className="text-xs text-slate-300 mt-1 max-w-xl leading-relaxed">
+                Grounds Gemini 2.0 Flash in your household's vulnerable conditions, {selectedCity.name}’s calculated AQI ({aqiData.aqi} - {aqiData.category}), and chosen commute legs to output time-slotted routines and indoor air safeguards.
               </p>
             </div>
 
             <button
               onClick={handleGenerateAdvice}
               disabled={adviceLoading}
-              className="w-full sm:w-auto px-6 py-3.5 bg-white text-emerald-800 hover:bg-emerald-50 disabled:opacity-75 font-bold text-sm rounded-xl shadow-sm flex items-center justify-center gap-2 shrink-0 transition-transform active:scale-95"
+              className="relative z-10 w-full md:w-auto px-7 py-4 bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 hover:from-emerald-400 hover:to-teal-500 disabled:opacity-50 font-black text-sm text-slate-950 rounded-2xl shadow-xl flex items-center justify-center gap-2.5 shrink-0 transition-all active:scale-95 hover:shadow-emerald-500/25 cursor-pointer"
             >
               {adviceLoading ? (
                 <>
-                  <Loader2 className="w-4 h-4 animate-spin text-emerald-700" />
-                  Generating Plan...
+                  <Loader2 className="w-4 h-4 animate-spin text-slate-950" />
+                  <span>Synthesizing Strategy...</span>
                 </>
               ) : (
                 <>
-                  <Sparkles className="w-4 h-4 text-amber-500" />
-                  {advice ? "Re-generate Advice" : "Get Family Action Plan"}
+                  <Sparkles className="w-4 h-4 text-slate-950" />
+                  <span>{advice ? "Re-synthesize Strategy" : "Get Family Action Plan"}</span>
                 </>
               )}
             </button>
           </div>
         )}
 
+        {/* Advice Error Notice */}
         {adviceError && (
-          <div className="bg-rose-50 border border-rose-200 text-rose-800 rounded-2xl p-4 text-sm mb-6">
-            <strong>Unable to generate advice:</strong> {adviceError}
+          <div className="glass-panel border-rose-500/40 bg-rose-950/40 text-rose-200 rounded-3xl p-5 text-xs mb-6">
+            <strong className="text-white block mb-0.5">Generation Warning:</strong>
+            {adviceError}
           </div>
         )}
 
         {/* Advice & CO2 Results Display */}
         {advice && (
-          <div className="space-y-6 mb-6">
-            <div className="border-b border-slate-200 pb-3">
-              <h2 className="text-2xl font-black text-slate-800 flex items-center gap-2">
-                <Sparkles className="w-6 h-6 text-emerald-600" />
-                Family Action Plan & Low-Emission Strategy
-              </h2>
-              <p className="text-xs text-slate-500 mt-1">
-                Personalized guidance generated for {selectedCity.name} ({aqiData?.category} air quality).
-              </p>
+          <div className="space-y-6 mb-8 animate-fadeIn">
+            <div className="flex items-center gap-3 border-b border-white/10 pb-4">
+              <div className="p-2 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
+                <Award className="w-5 h-5" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-black text-white tracking-tight">
+                  Family Action Plan &amp; Low-Emission Strategy
+                </h2>
+                <p className="text-xs text-slate-400 mt-0.5">
+                  Tailored health buffer &amp; commute mitigation for {selectedCity.name} at AQI {aqiData?.aqi} ({aqiData?.category}).
+                </p>
+              </div>
             </div>
 
+            {/* CO2 Savings Widget */}
             <Co2SavingsWidget co2Estimate={advice.co2Estimate} />
+
+            {/* Personalized Family Members Health Advice */}
             <FamilyAdviceSection memberAdvice={advice.memberAdvice} />
+
+            {/* Indoor & Commute Tips */}
             <IndoorTipsPanel
               routineSuggestions={advice.routineSuggestions}
               indoorTips={advice.indoorTips}

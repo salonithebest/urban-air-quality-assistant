@@ -11,46 +11,52 @@ export const IndoorTipsPanel: React.FC<IndoorTipsPanelProps> = ({
   indoorTips,
 }) => {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-2">
       {/* Smog-smart routines */}
-      <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
-        <div className="flex items-center gap-2 mb-3">
-          <Sparkles className="w-5 h-5 text-amber-500" />
-          <h4 className="font-bold text-slate-800 text-base">
-            Low-Emission Commute Routines
+      <div className="glass-card rounded-3xl p-6 border border-white/10 relative overflow-hidden">
+        <div className="flex items-center gap-2 mb-4">
+          <div className="p-1.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400">
+            <Sparkles className="w-4 h-4" />
+          </div>
+          <h4 className="font-extrabold text-slate-100 text-base tracking-tight">
+            Exposure-Minimizing Commute Protocol
           </h4>
         </div>
-        <ul className="space-y-2.5">
+        <ul className="space-y-3">
           {routineSuggestions.map((tip, idx) => (
             <li
               key={idx}
-              className="text-xs text-slate-700 bg-amber-50/60 border border-amber-100/80 rounded-xl p-3 flex items-start gap-2.5"
+              className="text-xs text-slate-200 bg-amber-950/25 border border-amber-500/20 rounded-2xl p-3.5 flex items-start gap-3 shadow-inner hover:border-amber-500/40 transition-colors"
             >
-              <span className="w-5 h-5 bg-amber-500 text-white rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">
+              <span className="w-5 h-5 bg-amber-500/30 text-amber-300 border border-amber-500/40 rounded-full flex items-center justify-center text-[10px] font-black shrink-0 mt-0.5">
                 {idx + 1}
               </span>
-              <span className="leading-relaxed">{tip}</span>
+              <span className="leading-relaxed font-normal">{tip}</span>
             </li>
           ))}
         </ul>
       </div>
 
       {/* Indoor air quality */}
-      <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
-        <div className="flex items-center gap-2 mb-3">
-          <Home className="w-5 h-5 text-teal-600" />
-          <h4 className="font-bold text-slate-800 text-base">
-            Indoor Air & Ventilation Tips
+      <div className="glass-card rounded-3xl p-6 border border-white/10 relative overflow-hidden">
+        <div className="flex items-center gap-2 mb-4">
+          <div className="p-1.5 rounded-xl bg-teal-500/10 border border-teal-500/20 text-teal-400">
+            <Home className="w-4 h-4" />
+          </div>
+          <h4 className="font-extrabold text-slate-100 text-base tracking-tight">
+            Indoor Air &amp; Micro-Climate Safeguards
           </h4>
         </div>
-        <ul className="space-y-2.5">
+        <ul className="space-y-3">
           {indoorTips.map((tip, idx) => (
             <li
               key={idx}
-              className="text-xs text-slate-700 bg-teal-50/60 border border-teal-100/80 rounded-xl p-3 flex items-start gap-2.5"
+              className="text-xs text-slate-200 bg-teal-950/25 border border-teal-500/20 rounded-2xl p-3.5 flex items-start gap-3 shadow-inner hover:border-teal-500/40 transition-colors"
             >
-              <Fan className="w-4 h-4 text-teal-600 shrink-0 mt-0.5" />
-              <span className="leading-relaxed">{tip}</span>
+              <div className="p-1 rounded-lg bg-teal-500/20 text-teal-300 shrink-0 mt-0.5">
+                <Fan className="w-3.5 h-3.5" />
+              </div>
+              <span className="leading-relaxed font-normal">{tip}</span>
             </li>
           ))}
         </ul>

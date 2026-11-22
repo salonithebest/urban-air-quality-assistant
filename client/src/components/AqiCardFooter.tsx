@@ -1,5 +1,5 @@
 import React from "react";
-import { Info, ExternalLink } from "lucide-react";
+import { Info, ExternalLink, ShieldCheck } from "lucide-react";
 
 interface AqiCardFooterProps {
   dataNote: string;
@@ -7,34 +7,33 @@ interface AqiCardFooterProps {
 
 export const AqiCardFooter: React.FC<AqiCardFooterProps> = ({ dataNote }) => {
   return (
-    <footer className="mt-8 border-t border-slate-200/80 pt-4 pb-8 text-xs text-slate-500 flex flex-col sm:flex-row items-center justify-between gap-3">
-      <div className="flex items-center gap-1.5 text-center sm:text-left">
-        <Info className="w-4 h-4 text-slate-400 shrink-0" />
-        <span>{dataNote}</span>
+    <footer className="mt-10 border-t border-white/10 pt-6 pb-10 text-xs text-slate-400 flex flex-col md:flex-row items-center justify-between gap-4">
+      <div className="flex items-center gap-2 text-center md:text-left">
+        <div className="p-1 rounded-lg bg-slate-800/80 border border-white/5 text-slate-400 shrink-0">
+          <Info className="w-3.5 h-3.5" />
+        </div>
+        <span className="leading-relaxed">{dataNote}</span>
       </div>
 
-      <div className="flex items-center gap-3 shrink-0">
-        <span>
-          Data powered by{" "}
-          <a
-            href="https://open-meteo.com/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-emerald-700 hover:text-emerald-800 underline font-medium inline-flex items-center gap-0.5"
-          >
-            Open-Meteo Air Quality
-            <ExternalLink className="w-3 h-3" />
-          </a>{" "}
-          (CC-BY 4.0)
-        </span>
-        <span className="text-slate-300">•</span>
+      <div className="flex flex-wrap items-center justify-center gap-3 shrink-0">
+        <a
+          href="https://open-meteo.com/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="glass-card px-3 py-1.5 rounded-xl text-slate-300 hover:text-emerald-300 hover:border-emerald-500/40 inline-flex items-center gap-1.5 transition-colors"
+        >
+          <span>Open-Meteo Air Quality (CC-BY 4.0)</span>
+          <ExternalLink className="w-3 h-3 text-slate-400" />
+        </a>
+
         <a
           href="https://app.cpcbccr.com"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-slate-600 hover:text-slate-800 underline"
+          className="glass-card px-3 py-1.5 rounded-xl text-slate-300 hover:text-emerald-300 hover:border-emerald-500/40 inline-flex items-center gap-1.5 transition-colors"
         >
-          Official CPCB Sameer
+          <ShieldCheck className="w-3 h-3 text-emerald-400" />
+          <span>Official CPCB Sameer Portal</span>
         </a>
       </div>
     </footer>
