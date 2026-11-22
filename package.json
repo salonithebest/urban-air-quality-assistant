@@ -1,0 +1,19 @@
+{
+  "name": "urban-air-quality-assistant",
+  "version": "1.0.0",
+  "description": "Family-focused air-quality planner for Indian cities — PromptWars Challenge 06",
+  "private": true,
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "scripts": {
+    "dev:server": "npm run dev --workspace=server",
+    "dev:client": "npm run dev --workspace=client",
+    "test": "npm run test --workspace=server",
+    "test:coverage": "npm run test:coverage --workspace=server"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
