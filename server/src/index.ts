@@ -3,6 +3,7 @@ import cors from "cors";
 import helmet from "helmet";
 import { env } from "./config/env.js";
 import { airQualityRouter } from "./routes/airQuality.js";
+import { adviceRouter } from "./routes/advice.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 
 export const app = express();
@@ -24,6 +25,7 @@ app.get("/health", (_req, res) => {
 
 // Routes
 app.use("/api", airQualityRouter);
+app.use("/api", adviceRouter);
 
 // Central error handler
 app.use(errorHandler);
