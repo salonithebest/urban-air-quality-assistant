@@ -6,6 +6,7 @@ import { useGeminiAdvice } from "./hooks/useGeminiAdvice.js";
 import type { RoutineChoice } from "./types/index.js";
 
 import { CitySelector } from "./components/CitySelector.js";
+import { DimensionalPentagon } from "./components/DimensionalPentagon.js";
 import { AqiGauge } from "./components/AqiGauge.js";
 import { PollutantGrid } from "./components/PollutantGrid.js";
 import { FamilyProfileForm } from "./components/FamilyProfileForm.js";
@@ -15,7 +16,7 @@ import { IndoorTipsPanel } from "./components/IndoorTipsPanel.js";
 import { Co2SavingsWidget } from "./components/Co2SavingsWidget.js";
 import { AqiCardFooter } from "./components/AqiCardFooter.js";
 
-import { Sparkles, Loader2, RefreshCw, Shield, Award } from "lucide-react";
+import { Sparkles, Loader2, RefreshCw, Shield } from "lucide-react";
 
 export const App: React.FC = () => {
   // Start with Surat (as requested by user)
@@ -38,28 +39,28 @@ export const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen text-[#0F172A] flex flex-col justify-between selection:bg-emerald-500 selection:text-white">
+    <div className="min-h-screen text-slate-100 flex flex-col justify-between selection:bg-emerald-500 selection:text-white">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-10 w-full">
-        {/* Luxury Header */}
-        <header className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-5 border-b border-slate-200/80 pb-6">
+        {/* Luxury Cyber Header */}
+        <header className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-5 border-b border-slate-800 pb-6">
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <span className="relative flex h-2 w-2">
+              <span className="relative flex h-2.5 w-2.5">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500" />
               </span>
-              <span className="text-[11px] font-extrabold uppercase tracking-widest text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+              <span className="text-[11px] font-black uppercase tracking-widest text-emerald-400 bg-emerald-500/10 px-3 py-0.5 rounded-full border border-emerald-500/30">
                 Google PromptWars 06
               </span>
-              <span className="text-[11px] font-semibold text-slate-500 bg-slate-100 px-2.5 py-0.5 rounded-full hidden sm:inline-block">
+              <span className="text-[11px] font-bold text-slate-300 bg-slate-800/80 border border-slate-700 px-3 py-0.5 rounded-full hidden sm:inline-block">
                 CPCB National AQI Standard
               </span>
             </div>
 
-            <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+            <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight">
               Urban Air Quality Assistant
             </h1>
-            <p className="text-xs sm:text-sm text-slate-500 mt-1 max-w-2xl leading-relaxed">
+            <p className="text-xs sm:text-sm text-slate-300 mt-1 max-w-2xl leading-relaxed">
               Family-centered urban air health planner for Indian cities with verified CPCB breakpoint interpolation &amp; deterministic carbon reduction.
             </p>
           </div>
@@ -68,10 +69,10 @@ export const App: React.FC = () => {
             <button
               onClick={refetch}
               disabled={aqiLoading}
-              className="px-4 py-2.5 bg-white border border-slate-200 hover:border-slate-300 text-slate-700 text-xs font-bold rounded-xl flex items-center gap-2 transition-all active:scale-95 shadow-sm"
+              className="px-4 py-2.5 bg-slate-900/90 border border-emerald-500/30 hover:border-emerald-500 text-white hover:text-emerald-300 text-xs font-black rounded-xl flex items-center gap-2 transition-all active:scale-95 shadow-lg shadow-black/40"
               title="Refresh live atmospheric data"
             >
-              <RefreshCw className={`w-3.5 h-3.5 text-emerald-600 ${aqiLoading ? "animate-spin" : ""}`} />
+              <RefreshCw className={`w-3.5 h-3.5 text-emerald-400 ${aqiLoading ? "animate-spin" : ""}`} />
               <span>{aqiLoading ? "Syncing..." : "Refresh Atmosphere"}</span>
             </button>
           </div>
@@ -86,28 +87,40 @@ export const App: React.FC = () => {
 
         {/* Loading State */}
         {aqiLoading && !aqiData && (
-          <div className="luxury-card rounded-2xl p-14 text-center mb-6 flex flex-col items-center justify-center">
-            <Loader2 className="w-8 h-8 text-emerald-600 animate-spin mb-3" />
-            <p className="font-extrabold text-slate-900 text-base">Fetching live atmospheric models from Open-Meteo...</p>
+          <div className="cyber-panel rounded-3xl p-14 text-center mb-6 flex flex-col items-center justify-center border border-emerald-500/20">
+            <Loader2 className="w-10 h-10 text-emerald-400 animate-spin mb-3" />
+            <p className="font-black text-white text-lg">Fetching live atmospheric models from Open-Meteo...</p>
             <p className="text-xs text-slate-400 mt-1">Executing CPCB segmented linear sub-index interpolation</p>
           </div>
         )}
 
         {/* Error Notice */}
         {aqiError && (
-          <div className="bg-rose-50 border border-rose-200 text-rose-800 rounded-2xl p-4 text-xs sm:text-sm mb-6 flex items-start gap-3">
-            <Shield className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />
+          <div className="bg-rose-950/40 border border-rose-500/40 text-rose-200 rounded-2xl p-4 text-xs sm:text-sm mb-6 flex items-start gap-3">
+            <Shield className="w-5 h-5 text-rose-400 shrink-0 mt-0.5" />
             <div>
-              <strong className="font-bold text-slate-900 block mb-0.5">Atmospheric Sync Notice:</strong>
+              <strong className="font-bold text-white block mb-0.5">Atmospheric Sync Notice:</strong>
               {aqiError}
             </div>
           </div>
         )}
 
-        {/* Core AQI View */}
+        {/* Core Atmospheric Visualization */}
         {aqiData && (
           <>
+            {/* 3D Dimensional Atmosphere Matrix (Naukri Campus AI-Q inspired) */}
+            <DimensionalPentagon
+              aqi={aqiData.aqi}
+              category={aqiData.category}
+              city={aqiData.city}
+              prominentPollutant={aqiData.prominentPollutant}
+              pollutants={aqiData.pollutants}
+            />
+
+            {/* Standard CPCB Gauge */}
             <AqiGauge data={aqiData} />
+
+            {/* 6 Pollutant Micro-Cards */}
             <PollutantGrid pollutants={aqiData.pollutants} />
           </>
         )}
@@ -127,20 +140,20 @@ export const App: React.FC = () => {
 
         {/* Advice CTA Action Banner */}
         {aqiData && (
-          <div className="bg-gradient-to-r from-emerald-800 via-teal-800 to-slate-900 rounded-2xl p-6 sm:p-7 text-white mb-6 flex flex-col md:flex-row items-center justify-between gap-5 shadow-lg relative overflow-hidden">
+          <div className="cyber-panel-glow rounded-3xl p-6 sm:p-8 text-white mb-6 flex flex-col md:flex-row items-center justify-between gap-5 border border-emerald-500/40 shadow-2xl relative overflow-hidden">
             <div className="relative z-10 flex-1">
-              <div className="flex items-center gap-2 mb-1.5">
+              <div className="flex items-center gap-2 mb-2">
                 <span className="p-1 rounded-md bg-emerald-500/20 text-emerald-300">
-                  <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                  <Sparkles className="w-4 h-4 text-emerald-300" />
                 </span>
-                <span className="text-[11px] font-extrabold uppercase tracking-widest text-emerald-300">
+                <span className="text-[11px] font-black uppercase tracking-widest text-emerald-400">
                   AI-Powered Family Intelligence
                 </span>
               </div>
-              <h3 className="font-extrabold text-xl sm:text-2xl text-white tracking-tight">
+              <h3 className="font-black text-2xl sm:text-3xl text-white tracking-tight">
                 Synthesize Personalized Family Protocol
               </h3>
-              <p className="text-xs text-slate-200 mt-1 max-w-xl leading-relaxed">
+              <p className="text-xs text-slate-300 mt-1.5 max-w-xl leading-relaxed">
                 Grounds Gemini 2.0 Flash in your household's vulnerable conditions, {selectedCity.name}’s calculated AQI ({aqiData.aqi} - {aqiData.category}), and chosen commute legs to output time-slotted routines and indoor air safeguards.
               </p>
             </div>
@@ -148,7 +161,7 @@ export const App: React.FC = () => {
             <button
               onClick={handleGenerateAdvice}
               disabled={adviceLoading}
-              className="relative z-10 w-full md:w-auto px-7 py-3.5 bg-emerald-400 hover:bg-emerald-300 disabled:opacity-50 font-black text-sm text-slate-950 rounded-xl shadow-md flex items-center justify-center gap-2.5 shrink-0 transition-all active:scale-95 cursor-pointer"
+              className="relative z-10 w-full md:w-auto px-8 py-4 bg-emerald-400 hover:bg-emerald-300 disabled:opacity-50 font-black text-sm text-slate-950 rounded-2xl shadow-xl shadow-emerald-500/30 flex items-center justify-center gap-2.5 shrink-0 transition-all active:scale-95 cursor-pointer"
             >
               {adviceLoading ? (
                 <>
@@ -158,45 +171,41 @@ export const App: React.FC = () => {
               ) : (
                 <>
                   <Sparkles className="w-4 h-4 text-slate-950" />
-                  <span>{advice ? "Re-synthesize Strategy" : "Get Family Action Plan"}</span>
+                  <span>Get Family Action Plan</span>
                 </>
               )}
             </button>
           </div>
         )}
 
-        {/* Advice Error Notice */}
+        {/* Advice Error Display */}
         {adviceError && (
-          <div className="bg-rose-50 border border-rose-200 text-rose-800 rounded-2xl p-4 text-xs mb-6">
-            <strong className="text-slate-900 block mb-0.5">Generation Warning:</strong>
+          <div className="bg-rose-950/40 border border-rose-500/40 text-rose-200 rounded-2xl p-4 text-xs mb-6">
+            <strong className="font-bold text-white block mb-0.5">Advice Synthesis Notice:</strong>
             {adviceError}
           </div>
         )}
 
-        {/* Advice & CO2 Results Display */}
+        {/* AI Action Plan Results */}
         {advice && (
-          <div className="space-y-6 mb-8">
-            <div className="flex items-center gap-3 border-b border-slate-200 pb-4">
-              <div className="p-2 rounded-xl bg-emerald-100 text-emerald-800">
-                <Award className="w-5 h-5" />
-              </div>
-              <div>
-                <h2 className="text-2xl font-extrabold text-slate-900 tracking-tight">
-                  Family Action Plan &amp; Low-Emission Strategy
-                </h2>
-                <p className="text-xs text-slate-500 mt-0.5">
-                  Tailored health buffer &amp; commute mitigation for {selectedCity.name} at AQI {aqiData?.aqi} ({aqiData?.category}).
-                </p>
-              </div>
+          <div className="mt-8 pt-6 border-t border-slate-800 space-y-6">
+            <div className="flex items-center gap-2.5">
+              <span className="relative flex h-3 w-3">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500" />
+              </span>
+              <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+                Personalized Family Action Plan
+              </h2>
             </div>
 
-            {/* CO2 Savings Widget */}
+            {/* Deterministic CO2 Savings */}
             <Co2SavingsWidget co2Estimate={advice.co2Estimate} />
 
-            {/* Personalized Family Members Health Advice */}
+            {/* Individual Family Member Protocols */}
             <FamilyAdviceSection memberAdvice={advice.memberAdvice} />
 
-            {/* Indoor & Commute Tips */}
+            {/* Indoor Air Hacks & Commute Schedules */}
             <IndoorTipsPanel
               routineSuggestions={advice.routineSuggestions}
               indoorTips={advice.indoorTips}
@@ -204,13 +213,8 @@ export const App: React.FC = () => {
           </div>
         )}
 
-        {/* Footer with CC-BY 4.0 Attribution and Disclaimer */}
-        <AqiCardFooter
-          dataNote={
-            aqiData?.dataNote ||
-            "Estimated AQI from model data (hourly) — not an official CPCB reading."
-          }
-        />
+        {/* Methodology & Data Source Disclaimers */}
+        {aqiData && <AqiCardFooter dataNote={aqiData.dataNote} />}
       </div>
     </div>
   );

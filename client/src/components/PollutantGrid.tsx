@@ -10,13 +10,13 @@ interface PollutantGridProps {
 export const PollutantGrid: React.FC<PollutantGridProps> = ({ pollutants }) => {
   return (
     <div className="mb-6">
-      <div className="flex items-center justify-between mb-3 px-0.5">
+      <div className="flex items-center justify-between mb-3.5 px-1">
         <div className="flex items-center gap-2">
-          <Wind className="w-4 h-4 text-emerald-600" />
-          <h3 className="font-bold text-slate-900 text-base sm:text-lg">
+          <Wind className="w-4 h-4 text-emerald-400" />
+          <h3 className="font-extrabold text-white text-base sm:text-lg tracking-tight">
             CPCB Pollutant Concentrations &amp; Sub-Indices
           </h3>
-          <span className="text-[11px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-semibold">
+          <span className="text-[11px] bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 px-2.5 py-0.5 rounded-full font-bold">
             6 Parameters
           </span>
         </div>
@@ -26,7 +26,7 @@ export const PollutantGrid: React.FC<PollutantGridProps> = ({ pollutants }) => {
         </span>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5">
         {pollutants.map((p) => {
           const theme = AQI_CATEGORY_THEMES[p.category] || AQI_CATEGORY_THEMES["Moderately Polluted"];
           const name = POLLUTANT_NAMES[p.pollutant] || p.pollutant;
@@ -34,22 +34,22 @@ export const PollutantGrid: React.FC<PollutantGridProps> = ({ pollutants }) => {
           return (
             <div
               key={p.pollutant}
-              className="luxury-card rounded-2xl p-4 flex flex-col justify-between"
+              className="cyber-panel rounded-2xl p-4 flex flex-col justify-between hover:border-emerald-500/50 transition-all"
             >
               <div>
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-xs font-bold text-slate-800">
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-xs font-black text-slate-200">
                     {name}
                   </span>
                   <span
-                    className="w-2 h-2 rounded-full"
+                    className="w-2.5 h-2.5 rounded-full"
                     style={{ backgroundColor: theme.accent }}
                   />
                 </div>
 
                 <div className="mt-2 flex items-baseline justify-between">
                   <div>
-                    <div className="text-2xl font-black text-slate-900 tracking-tight">
+                    <div className="text-2xl sm:text-3xl font-black text-white tracking-tight">
                       {p.concentration.toFixed(1)}
                     </div>
                     <div className="text-[10px] text-slate-400 font-medium">
@@ -59,21 +59,22 @@ export const PollutantGrid: React.FC<PollutantGridProps> = ({ pollutants }) => {
 
                   <div className="text-right">
                     <div
-                      className="text-base font-extrabold"
+                      className="text-base font-black"
                       style={{ color: theme.accent }}
                     >
                       {p.subIndex}
                     </div>
-                    <div className="text-[9px] text-slate-400 uppercase font-semibold">
+                    <div className="text-[9px] text-slate-400 uppercase font-bold tracking-wider">
                       Sub-Index
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between">
+              <div className="mt-3 pt-2.5 border-t border-slate-800">
                 <span
-                  className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${theme.badgeBg} ${theme.badgeText} ${theme.badgeBorder}`}
+                  className="text-[10px] font-extrabold block truncate uppercase tracking-wider"
+                  style={{ color: theme.accent }}
                 >
                   {p.category}
                 </span>

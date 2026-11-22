@@ -83,49 +83,49 @@ export const CitySelector: React.FC<CitySelectorProps> = ({
   localFiltered.forEach(addUnique);
 
   return (
-    <div className="luxury-card rounded-2xl p-5 mb-6">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div className="cyber-panel rounded-2xl p-5 sm:p-6 mb-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-5">
         {/* Active City Display */}
         <div>
-          <div className="flex items-center gap-1.5 mb-1 text-slate-500">
-            <MapPin className="w-4 h-4 text-emerald-600" />
-            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+          <div className="flex items-center gap-2 mb-1.5">
+            <MapPin className="w-4 h-4 text-emerald-400" />
+            <span className="text-[11px] font-extrabold uppercase tracking-widest text-emerald-400">
               Selected Locality
             </span>
             {selectedCity.name === "Limla" && (
-              <span className="text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded-full flex items-center gap-1">
-                <Sparkles className="w-2.5 h-2.5 text-emerald-600" /> Hyperlocal
+              <span className="text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 px-2 py-0.5 rounded-full flex items-center gap-1">
+                <Sparkles className="w-2.5 h-2.5 text-emerald-300" /> Hyperlocal
               </span>
             )}
           </div>
-          <div className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight flex items-baseline gap-2">
-            {selectedCity.name}
-            <span className="text-sm font-medium text-slate-500">
+          <div className="text-2xl sm:text-3xl font-black text-white tracking-tight flex items-baseline gap-2.5">
+            <span>{selectedCity.name}</span>
+            <span className="text-sm font-semibold text-slate-300">
               {selectedCity.state}
             </span>
-            <span className="text-xs font-mono text-slate-400 font-normal hidden sm:inline">
+            <span className="text-xs font-mono text-emerald-400/80 font-normal hidden sm:inline">
               ({selectedCity.lat.toFixed(2)}°N, {selectedCity.lon.toFixed(2)}°E)
             </span>
           </div>
         </div>
 
         {/* Search & Selector Controls */}
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 max-w-lg w-full">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 max-w-lg w-full">
           <div className="relative flex-1">
             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
             <input
               type="text"
-              placeholder="Search Indian city or town (e.g. Limla, Surat)..."
+              placeholder="Search Indian locality (e.g. Limla, Surat)..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-9 pr-8 py-2.5 text-xs luxury-input rounded-xl focus:outline-none"
+              className="w-full pl-9 pr-8 py-2.5 text-xs cyber-input rounded-xl focus:outline-none"
             />
             {isSearching && (
-              <Loader2 className="w-3.5 h-3.5 absolute right-3 top-1/2 -translate-y-1/2 text-emerald-600 animate-spin" />
+              <Loader2 className="w-3.5 h-3.5 absolute right-3 top-1/2 -translate-y-1/2 text-emerald-400 animate-spin" />
             )}
           </div>
 
-          <div className="relative min-w-[190px]">
+          <div className="relative min-w-[200px]">
             <select
               value={`${selectedCity.name}|${selectedCity.lat}`}
               disabled={isLoading}
@@ -137,10 +137,10 @@ export const CitySelector: React.FC<CitySelectorProps> = ({
                   setSearch("");
                 }
               }}
-              className="w-full appearance-none pl-3.5 pr-8 py-2.5 text-xs luxury-input rounded-xl font-semibold text-slate-800 cursor-pointer"
+              className="w-full appearance-none pl-3.5 pr-8 py-2.5 text-xs cyber-input rounded-xl font-bold text-white cursor-pointer"
             >
               {combinedCities.map((city) => (
-                <option key={`${city.name}-${city.lat}`} value={`${city.name}|${city.lat}`}>
+                <option key={`${city.name}-${city.lat}`} value={`${city.name}|${city.lat}`} className="bg-[#0b1120] text-white">
                   {city.name} ({city.state})
                 </option>
               ))}
@@ -152,9 +152,9 @@ export const CitySelector: React.FC<CitySelectorProps> = ({
 
       {/* Suggested Search Chips */}
       {search.trim().length >= 2 && combinedCities.length > 0 && (
-        <div className="mt-3.5 pt-3 border-t border-slate-100 flex flex-wrap items-center gap-2">
-          <span className="text-[11px] text-slate-400 font-semibold uppercase tracking-wider">
-            Matching Locations:
+        <div className="mt-4 pt-3.5 border-t border-slate-800 flex flex-wrap items-center gap-2">
+          <span className="text-[11px] text-slate-400 font-bold uppercase tracking-wider">
+            Matching Localities:
           </span>
           {combinedCities.slice(0, 6).map((city) => (
             <button
@@ -164,9 +164,9 @@ export const CitySelector: React.FC<CitySelectorProps> = ({
                 onSelectCity(city);
                 setSearch("");
               }}
-              className="text-xs bg-slate-50 hover:bg-emerald-50 text-slate-700 hover:text-emerald-800 border border-slate-200 hover:border-emerald-200 px-2.5 py-1 rounded-lg font-medium transition-all active:scale-95"
+              className="text-xs bg-slate-800/80 hover:bg-emerald-500/20 text-slate-200 hover:text-emerald-300 border border-slate-700 hover:border-emerald-500/50 px-2.5 py-1 rounded-lg font-medium transition-all active:scale-95"
             >
-              📍 {city.name} <span className="text-[10px] text-slate-500">({city.state})</span>
+              📍 {city.name} <span className="text-[10px] text-slate-400">({city.state})</span>
             </button>
           ))}
         </div>
