@@ -92,6 +92,56 @@ describe("POST /api/advice", () => {
     expect(Array.isArray(res.body.indoorTips)).toBe(true);
   });
 
+  it("accepts exact default members from useFamilyProfile.ts", async () => {
+    const clientPayloadWithDefaultMembers = {
+      aqiSnapshot: validPayload.aqiSnapshot,
+      familyProfile: {
+        members: [
+          { id: "d3b07384-d113-4944-9c87-8275e6fb0a11", name: "Aarav", role: "child" },
+          { id: "e4c18495-e224-4a55-ad98-9386f70c1b22", name: "Saloni", role: "adult" },
+          { id: "f5d295a6-f335-4b66-be09-a497081d2c33", name: "Dada ji", role: "senior" },
+        ],
+      },
+      routineChoices: [
+        { activityType: "metro", durationMinutes: 35, distanceKm: 14 },
+      ],
+      indoorContext: {
+        hasAirPurifier: true,
+        hasPlants: true,
+        ventilationType: "natural",
+      },
+    };
+
+    const res = await request(app).post("/api/advice").send(clientPayloadWithDefaultMembers);
+    expect(res.status).toBe(200);
+    expect(res.body.memberAdvice.length).toBe(3);
+    expect(res.body.co2Estimate).toBeDefined();
+  });
+
+  it("returns 400 when a member id is not a valid UUID (e.g. legacy id '1')", async () => {
+    const invalidPayload = {
+      ...validPayload,
+      familyProfile: {
+        members: [
+          { id: "1", name: "Aarav", role: "child" },
+          { id: "2", name: "Saloni", role: "adult" },
+        ],
+      },
+    };
+
+    const res = await request(app).post("/api/advice").send(invalidPayload);
+    expect(res.status).toBe(400);
+    expect(res.body.error).toBe("Validation failed");
+    expect(res.body.details).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          field: "familyProfile.members.0.id",
+          message: "Invalid uuid",
+        }),
+      ])
+    );
+  });
+
   it("returns 400 when body does not match AdviceRequestSchema", async () => {
     const res = await request(app)
       .post("/api/advice")

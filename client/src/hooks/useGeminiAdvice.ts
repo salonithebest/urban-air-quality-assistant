@@ -42,7 +42,10 @@ export function useGeminiAdvice() {
 
         if (!res.ok) {
           const errJson = await res.json().catch(() => ({}));
-          throw new Error(errJson.error || errJson.message || `Failed with status ${res.status}`);
+          const detailsMsg = errJson.details
+            ? errJson.details.map((d: { field: string; message: string }) => `${d.field}: ${d.message}`).join("; ")
+            : null;
+          throw new Error(detailsMsg || errJson.error || errJson.message || `Failed with status ${res.status}`);
         }
 
         const data = (await res.json()) as AdviceResponse;

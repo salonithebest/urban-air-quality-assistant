@@ -4,18 +4,49 @@ import type { FamilyMember } from "../types/index.js";
 const STORAGE_KEY = "urban_aqi_family_profile";
 
 const DEFAULT_MEMBERS: FamilyMember[] = [
-  { id: "1", name: "Aarav", role: "child" },
-  { id: "2", name: "Saloni", role: "adult" },
-  { id: "3", name: "Dada ji", role: "senior" },
+  { id: "d3b07384-d113-4944-9c87-8275e6fb0a11", name: "Aarav", role: "child" },
+  { id: "e4c18495-e224-4a55-ad98-9386f70c1b22", name: "Saloni", role: "adult" },
+  { id: "f5d295a6-f335-4b66-be09-a497081d2c33", name: "Dada ji", role: "senior" },
 ];
+
+function generateUUIDv4(): string {
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+    return crypto.randomUUID();
+  }
+  if (typeof crypto !== "undefined" && typeof crypto.getRandomValues === "function") {
+    const bytes = new Uint8Array(16);
+    crypto.getRandomValues(bytes);
+    bytes[6] = (bytes[6]! & 0x0f) | 0x40; // Version 4
+    bytes[8] = (bytes[8]! & 0x3f) | 0x80; // Variant 10xx
+    const hex = Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
+    return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+  }
+  // Ultimate standard fallback for environments without crypto
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0;
+    const v = c === "x" ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+}
 
 export function useFamilyProfile() {
   const [members, setMembers] = useState<FamilyMember[]>(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) return JSON.parse(saved);
+      if (saved) {
+        const parsed: FamilyMember[] = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          const uuidRegex =
+            /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+          // Keep all valid saved members, and regenerate UUIDs only for members with invalid IDs
+          return parsed.map((m) => ({
+            ...m,
+            id: uuidRegex.test(m.id) ? m.id : generateUUIDv4(),
+          }));
+        }
+      }
     } catch {
-      // ignore
+      // ignore JSON parse or localStorage errors
     }
     return DEFAULT_MEMBERS;
   });
@@ -32,7 +63,7 @@ export function useFamilyProfile() {
     if (members.length >= 10) return;
     const newMember: FamilyMember = {
       ...member,
-      id: crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(),
+      id: generateUUIDv4(),
     };
     setMembers((prev) => [...prev, newMember]);
   };

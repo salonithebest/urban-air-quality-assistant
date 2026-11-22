@@ -148,20 +148,30 @@ export const App: React.FC = () => {
 
         {adviceError && (
           <div className="bg-rose-50 border border-rose-200 text-rose-800 rounded-2xl p-4 text-sm mb-6">
-            {adviceError}
+            <strong>Unable to generate advice:</strong> {adviceError}
           </div>
         )}
 
         {/* Advice & CO2 Results Display */}
         {advice && (
-          <>
+          <div className="space-y-6 mb-6">
+            <div className="border-b border-slate-200 pb-3">
+              <h2 className="text-2xl font-black text-slate-800 flex items-center gap-2">
+                <Sparkles className="w-6 h-6 text-emerald-600" />
+                Family Action Plan & Low-Emission Strategy
+              </h2>
+              <p className="text-xs text-slate-500 mt-1">
+                Personalized guidance generated for {selectedCity.name} ({aqiData?.category} air quality).
+              </p>
+            </div>
+
             <Co2SavingsWidget co2Estimate={advice.co2Estimate} />
             <FamilyAdviceSection memberAdvice={advice.memberAdvice} />
             <IndoorTipsPanel
               routineSuggestions={advice.routineSuggestions}
               indoorTips={advice.indoorTips}
             />
-          </>
+          </div>
         )}
 
         {/* Footer with CC-BY 4.0 Attribution and Disclaimer */}

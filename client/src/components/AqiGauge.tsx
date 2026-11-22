@@ -29,7 +29,7 @@ export const AqiGauge: React.FC<AqiGaugeProps> = ({ data }) => {
 
           <h2 className="text-2xl font-extrabold text-slate-800 flex items-center gap-2">
             <Activity className="w-6 h-6 text-slate-700" />
-            Live National AQI for {data.city}
+            Estimated AQI (CPCB method, hourly model data) for {data.city}
           </h2>
           <p className="text-sm mt-1 text-slate-600 max-w-xl">
             {theme.advisory}
