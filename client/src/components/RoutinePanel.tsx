@@ -39,14 +39,12 @@ export const RoutinePanel: React.FC<RoutinePanelProps> = ({
   };
 
   return (
-    <div className="glass-panel rounded-3xl p-6 flex flex-col justify-between border border-white/10 relative overflow-hidden transition-all duration-300">
+    <div className="luxury-card rounded-2xl p-5 sm:p-6 flex flex-col justify-between">
       <div>
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <div className="p-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
-              <Compass className="w-4 h-4" />
-            </div>
-            <h3 className="font-extrabold text-slate-100 text-lg tracking-tight">
+            <Compass className="w-5 h-5 text-emerald-600" />
+            <h3 className="font-extrabold text-slate-900 text-lg tracking-tight">
               Daily Family Commute Legs
             </h3>
           </div>
@@ -55,7 +53,7 @@ export const RoutinePanel: React.FC<RoutinePanelProps> = ({
             <button
               type="button"
               onClick={addChoice}
-              className="text-xs bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-300 font-bold px-3 py-1.5 rounded-2xl flex items-center gap-1.5 transition-all active:scale-95 shadow-sm"
+              className="text-xs bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold px-3 py-1.5 rounded-xl border border-emerald-200 flex items-center gap-1.5 transition-all active:scale-95 shadow-sm"
             >
               <Plus className="w-3.5 h-3.5" />
               Add Commute Leg
@@ -63,11 +61,11 @@ export const RoutinePanel: React.FC<RoutinePanelProps> = ({
           )}
         </div>
 
-        <p className="text-xs text-slate-400 mb-4 leading-relaxed">
-          Configure daily transport legs to calculate tailored tailpipe exposure &amp; deterministic carbon reduction vs. solo car transit.
+        <p className="text-xs text-slate-500 mb-4 leading-relaxed">
+          Configure daily transport legs to calculate personal particulate exposure &amp; deterministic carbon reduction vs. solo driving.
         </p>
 
-        {/* List of routine choices */}
+        {/* Routine list */}
         <div className="space-y-2.5 mb-2">
           {choices.map((c, idx) => {
             const modeObj = MODES.find((m) => m.value === c.activityType);
@@ -76,10 +74,10 @@ export const RoutinePanel: React.FC<RoutinePanelProps> = ({
             return (
               <div
                 key={idx}
-                className="glass-card rounded-2xl p-3 flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 border border-white/5 hover:border-white/15 transition-all"
+                className="bg-slate-50/70 border border-slate-200/80 rounded-xl p-3 flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5"
               >
                 <div className="flex items-center gap-2 flex-1">
-                  <div className="p-2 rounded-xl bg-slate-800/80 text-emerald-400 border border-white/5 shrink-0">
+                  <div className="p-2 rounded-lg bg-white border border-slate-200 text-emerald-700 shrink-0">
                     <Icon className="w-4 h-4" />
                   </div>
                   <select
@@ -87,10 +85,10 @@ export const RoutinePanel: React.FC<RoutinePanelProps> = ({
                     onChange={(e) =>
                       updateChoice(idx, { activityType: e.target.value as ActivityType })
                     }
-                    className="w-full text-xs font-semibold glass-input rounded-xl px-2.5 py-2 text-slate-200 cursor-pointer"
+                    className="w-full text-xs font-semibold luxury-input rounded-xl px-2.5 py-1.5 text-slate-800 cursor-pointer"
                   >
                     {MODES.map((m) => (
-                      <option key={m.value} value={m.value} className="bg-slate-900 text-slate-100">
+                      <option key={m.value} value={m.value}>
                         {m.label}
                       </option>
                     ))}
@@ -108,9 +106,9 @@ export const RoutinePanel: React.FC<RoutinePanelProps> = ({
                       onChange={(e) =>
                         updateChoice(idx, { distanceKm: Number(e.target.value) })
                       }
-                      className="w-full text-xs font-bold glass-input rounded-xl px-2.5 py-2 text-slate-200 text-center"
+                      className="w-full text-xs font-bold luxury-input rounded-xl px-2 py-1.5 text-slate-900 text-center"
                     />
-                    <span className="text-[9px] uppercase tracking-wider text-slate-500 font-semibold block text-center mt-0.5">
+                    <span className="text-[9px] uppercase tracking-wider text-slate-400 font-semibold block text-center mt-0.5">
                       Dist (km)
                     </span>
                   </div>
@@ -125,9 +123,9 @@ export const RoutinePanel: React.FC<RoutinePanelProps> = ({
                       onChange={(e) =>
                         updateChoice(idx, { durationMinutes: Number(e.target.value) })
                       }
-                      className="w-full text-xs font-bold glass-input rounded-xl px-2.5 py-2 text-slate-200 text-center"
+                      className="w-full text-xs font-bold luxury-input rounded-xl px-2 py-1.5 text-slate-900 text-center"
                     />
-                    <span className="text-[9px] uppercase tracking-wider text-slate-500 font-semibold block text-center mt-0.5">
+                    <span className="text-[9px] uppercase tracking-wider text-slate-400 font-semibold block text-center mt-0.5">
                       Duration (min)
                     </span>
                   </div>
@@ -136,7 +134,7 @@ export const RoutinePanel: React.FC<RoutinePanelProps> = ({
                     <button
                       type="button"
                       onClick={() => removeChoice(idx)}
-                      className="text-slate-500 hover:text-rose-400 p-2 transition-colors"
+                      className="text-slate-400 hover:text-rose-600 p-1.5 transition-colors"
                       title="Remove commute leg"
                     >
                       <Trash2 className="w-4 h-4" />

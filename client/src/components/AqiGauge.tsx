@@ -1,7 +1,7 @@
 import React from "react";
 import type { AqiResponse } from "../types/index.js";
 import { AQI_CATEGORY_THEMES, POLLUTANT_NAMES } from "../utils/aqiColors.js";
-import { Activity, AlertTriangle, ShieldCheck, Clock, Gauge } from "lucide-react";
+import { Activity, AlertCircle, ShieldCheck, Clock, Gauge } from "lucide-react";
 
 interface AqiGaugeProps {
   data: AqiResponse;
@@ -15,109 +15,110 @@ export const AqiGauge: React.FC<AqiGaugeProps> = ({ data }) => {
   const aqiPercentage = Math.min(100, Math.max(0, (data.aqi / 500) * 100));
 
   return (
-    <div
-      className={`glass-panel rounded-3xl p-6 sm:p-8 mb-6 border ${theme.border} relative overflow-hidden transition-all duration-500`}
-      style={{
-        boxShadow: `0 20px 40px -15px ${theme.glow}, 0 0 0 1px rgba(255, 255, 255, 0.05)`,
-      }}
-    >
-      {/* Background ambient lighting */}
-      <div
-        className={`absolute -top-24 -left-24 w-96 h-96 bg-gradient-to-br ${theme.bg} rounded-full blur-3xl pointer-events-none opacity-60`}
-      />
-
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative z-10">
+    <div className="luxury-hero rounded-2xl p-6 sm:p-8 mb-6 relative overflow-hidden">
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
         <div className="flex-1">
-          {/* Top badges */}
+          {/* Status Badges */}
           <div className="flex flex-wrap items-center gap-2 mb-3">
             <span
-              className={`px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider ${theme.badge} shadow-sm backdrop-blur-md`}
+              className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border ${theme.badgeBg} ${theme.badgeText} ${theme.badgeBorder}`}
             >
               {data.category}
             </span>
-            <span className="text-xs text-slate-300 font-medium glass-card px-3 py-1 rounded-full flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
-              Prominent: <strong className="text-slate-100 font-semibold">{prominent}</strong>
+
+            <span className="text-xs text-slate-700 font-medium bg-slate-100 border border-slate-200 px-3 py-1 rounded-full flex items-center gap-1.5">
+              <span
+                className="w-2 h-2 rounded-full"
+                style={{ backgroundColor: theme.accent }}
+              />
+              Prominent Pollutant: <strong className="text-slate-900 font-semibold">{prominent}</strong>
             </span>
-            <span className="text-xs text-slate-400 glass-card px-2.5 py-1 rounded-full flex items-center gap-1">
+
+            <span className="text-xs text-slate-500 bg-slate-50 border border-slate-200 px-2.5 py-1 rounded-full flex items-center gap-1">
               <Clock className="w-3 h-3 text-slate-400" />
               {new Date(data.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
             </span>
           </div>
 
-          <h2 className="text-2xl sm:text-3xl font-black text-slate-100 tracking-tight flex items-center gap-2.5">
-            <Activity className={`w-7 h-7 ${theme.text}`} />
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2.5">
+            <Activity className="w-6 h-6 text-emerald-600 shrink-0" />
             Estimated AQI (CPCB method, hourly model data) for {data.city}
           </h2>
 
-          <p className="text-sm mt-2 text-slate-300 max-w-2xl leading-relaxed font-normal">
+          <p className="text-sm mt-2 text-slate-600 max-w-2xl leading-relaxed">
             {theme.advisory}
           </p>
         </div>
 
-        {/* AQI Numeric Glass Orb */}
-        <div className="relative group shrink-0">
-          <div
-            className="absolute -inset-1 rounded-3xl blur-md opacity-40 group-hover:opacity-75 transition duration-500"
-            style={{ backgroundColor: theme.badgeHex }}
-          />
-          <div className="relative glass-card border border-white/10 rounded-3xl px-7 py-5 flex flex-col items-center justify-center min-w-[170px]">
-            <span className="text-[11px] font-bold uppercase tracking-widest text-slate-400 flex items-center gap-1 mb-0.5">
-              <Gauge className="w-3 h-3 text-emerald-400" /> CPCB Index
+        {/* Clean Minimalist Score Card */}
+        <div className="luxury-card rounded-2xl p-5 sm:px-7 sm:py-5 flex flex-col items-center justify-center min-w-[170px] shrink-0 border border-slate-200">
+          <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 flex items-center gap-1 mb-0.5">
+            <Gauge className="w-3 h-3 text-emerald-600" /> CPCB AQI
+          </span>
+          <div className="flex items-baseline gap-1">
+            <span
+              className="text-5xl sm:text-6xl font-black tracking-tight"
+              style={{ color: theme.accent }}
+            >
+              {data.aqi}
             </span>
-            <div className="flex items-baseline gap-1">
-              <span className="text-6xl font-black tracking-tight text-white drop-shadow-md">
-                {data.aqi}
-              </span>
-              <span className="text-xs font-bold text-slate-400">/500</span>
-            </div>
-            <span className={`text-[11px] font-extrabold uppercase tracking-wider mt-1 ${theme.text}`}>
-              {theme.label}
-            </span>
+            <span className="text-xs font-bold text-slate-400">/ 500</span>
           </div>
+          <span
+            className="text-[11px] font-extrabold uppercase tracking-wider mt-1"
+            style={{ color: theme.accent }}
+          >
+            {theme.label}
+          </span>
         </div>
       </div>
 
-      {/* Visual Spectrum Needle Bar */}
-      <div className="mt-8 relative z-10">
-        <div className="flex justify-between text-[11px] font-bold text-slate-400 mb-2">
-          <span className="text-emerald-400">0 Good</span>
-          <span className="text-lime-400">100 Sat.</span>
-          <span className="text-amber-400">200 Mod.</span>
-          <span className="text-orange-400">300 Poor</span>
-          <span className="text-rose-400">400 V.Poor</span>
-          <span className="text-red-500">500 Severe</span>
+      {/* Clean Gradient Spectrum Bar */}
+      <div className="mt-8">
+        <div className="flex justify-between text-[11px] font-bold text-slate-500 mb-2">
+          <span>0 Good</span>
+          <span>100 Sat.</span>
+          <span>200 Mod.</span>
+          <span>300 Poor</span>
+          <span>400 V.Poor</span>
+          <span>500 Severe</span>
         </div>
 
-        <div className="h-3 w-full bg-slate-900/80 rounded-full p-0.5 border border-white/10 relative overflow-visible shadow-inner">
+        <div className="h-2.5 w-full bg-slate-100 rounded-full relative overflow-visible">
           <div
-            className="h-full rounded-full transition-all duration-1000 ease-out"
+            className="h-full rounded-full transition-all duration-700 ease-out"
             style={{
-              background: "linear-gradient(90deg, #10b981 0%, #84cc16 20%, #eab308 40%, #f97316 60%, #f43f5e 80%, #b91c1c 100%)",
+              background: "linear-gradient(90deg, #10b981 0%, #84cc16 20%, #f59e0b 40%, #ea580c 60%, #e11d48 80%, #991b1b 100%)",
               width: `${aqiPercentage}%`,
             }}
           />
-          {/* Glowing cursor pointer */}
+          {/* Subtle position marker */}
           <div
-            className="absolute top-1/2 -translate-y-1/2 -ml-2 w-4 h-4 rounded-full border-2 border-white bg-slate-900 shadow-lg transition-all duration-1000 ease-out"
-            style={{ left: `${aqiPercentage}%`, borderColor: theme.badgeHex }}
+            className="absolute top-1/2 -translate-y-1/2 -ml-2.5 w-5 h-5 rounded-full border-2 border-white bg-slate-900 shadow-md transition-all duration-700 ease-out"
+            style={{ left: `${aqiPercentage}%`, backgroundColor: theme.accent }}
           />
         </div>
       </div>
 
-      {/* Bottom context notice */}
-      <div className="mt-5 pt-4 border-t border-white/5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs text-slate-400 relative z-10">
-        <div className="flex items-center gap-2">
+      {/* Technical Methodology Strip */}
+      <div className="mt-5 pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs text-slate-500">
+        <div className="flex items-center gap-1.5">
           {data.aqi <= 100 ? (
-            <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+            <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
           ) : (
-            <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
+            <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
           )}
           <span>
-            Computed strictly via standard CPCB segmented linear interpolation:{" "}
-            <code className="text-slate-300 font-mono text-[11px]">I = ((I_hi - I_lo)/(C_hi - C_lo)) * (C - C_lo) + I_lo</code>
+            Linear interpolation formula:{" "}
+            <code className="text-slate-700 font-mono text-[11px] bg-slate-100 px-1.5 py-0.5 rounded">
+              I = ((I_hi - I_lo) / (C_hi - C_lo)) * (C - C_lo) + I_lo
+            </code>
           </span>
         </div>
+
+        <span className="text-[11px] text-slate-400">
+          O₃ &amp; CO use 8-hr rolling window standards
+        </span>
       </div>
     </div>
   );

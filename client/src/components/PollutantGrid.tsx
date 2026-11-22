@@ -1,7 +1,7 @@
 import React from "react";
 import type { PollutantReading } from "../types/index.js";
 import { AQI_CATEGORY_THEMES, POLLUTANT_NAMES } from "../utils/aqiColors.js";
-import { Wind, HelpCircle } from "lucide-react";
+import { Wind } from "lucide-react";
 
 interface PollutantGridProps {
   pollutants: PollutantReading[];
@@ -10,22 +10,19 @@ interface PollutantGridProps {
 export const PollutantGrid: React.FC<PollutantGridProps> = ({ pollutants }) => {
   return (
     <div className="mb-6">
-      <div className="flex items-center justify-between mb-3 px-1">
+      <div className="flex items-center justify-between mb-3 px-0.5">
         <div className="flex items-center gap-2">
-          <div className="p-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
-            <Wind className="w-4 h-4" />
-          </div>
-          <h3 className="font-extrabold text-slate-100 text-lg tracking-tight">
-            CPCB Pollutant Sub-Index Breakdown
+          <Wind className="w-4 h-4 text-emerald-600" />
+          <h3 className="font-bold text-slate-900 text-base sm:text-lg">
+            CPCB Pollutant Concentrations &amp; Sub-Indices
           </h3>
-          <span className="text-[11px] bg-slate-800 text-slate-300 border border-white/10 px-2 py-0.5 rounded-full font-semibold">
-            6 Criteria Pollutants
+          <span className="text-[11px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-semibold">
+            6 Parameters
           </span>
         </div>
 
-        <span className="text-xs text-slate-400 hidden sm:flex items-center gap-1">
-          <HelpCircle className="w-3.5 h-3.5 text-slate-500" />
-          Sub-index &gt; 100 triggers advisory
+        <span className="text-xs text-slate-400 hidden sm:inline">
+          Sub-index &gt; 100 exceeds national ambient standard
         </span>
       </div>
 
@@ -37,43 +34,47 @@ export const PollutantGrid: React.FC<PollutantGridProps> = ({ pollutants }) => {
           return (
             <div
               key={p.pollutant}
-              className={`glass-card rounded-2xl p-4 flex flex-col justify-between border ${theme.border} group relative overflow-hidden`}
+              className="luxury-card rounded-2xl p-4 flex flex-col justify-between"
             >
-              {/* Subtle top glow bar */}
-              <div
-                className="absolute top-0 left-0 right-0 h-1 opacity-70 group-hover:opacity-100 transition-opacity"
-                style={{ backgroundColor: theme.badgeHex }}
-              />
-
               <div>
-                <div className="text-[11px] font-bold text-slate-300 truncate mb-1" title={name}>
-                  {p.pollutant.toUpperCase()}
-                </div>
-                <div className="text-[10px] text-slate-400 truncate mb-3" title={name}>
-                  {name.split("(")[0]?.trim()}
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-xs font-bold text-slate-800">
+                    {name}
+                  </span>
+                  <span
+                    className="w-2 h-2 rounded-full"
+                    style={{ backgroundColor: theme.accent }}
+                  />
                 </div>
 
-                <div className="flex items-baseline justify-between mb-2">
+                <div className="mt-2 flex items-baseline justify-between">
                   <div>
-                    <span className="text-2xl font-black text-white tracking-tight">
+                    <div className="text-2xl font-black text-slate-900 tracking-tight">
                       {p.concentration.toFixed(1)}
-                    </span>
-                    <span className="text-[10px] text-slate-400 ml-1 font-medium">{p.unit}</span>
+                    </div>
+                    <div className="text-[10px] text-slate-400 font-medium">
+                      {p.unit}
+                    </div>
                   </div>
 
                   <div className="text-right">
-                    <span className="text-base font-extrabold text-slate-200">
+                    <div
+                      className="text-base font-extrabold"
+                      style={{ color: theme.accent }}
+                    >
                       {p.subIndex}
-                    </span>
-                    <span className="text-[9px] text-slate-400 block uppercase font-semibold">
+                    </div>
+                    <div className="text-[9px] text-slate-400 uppercase font-semibold">
                       Sub-Index
-                    </span>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              <div className="pt-2 border-t border-white/5 flex items-center justify-between">
-                <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded-full ${theme.badge}`}>
+              <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between">
+                <span
+                  className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${theme.badgeBg} ${theme.badgeText} ${theme.badgeBorder}`}
+                >
                   {p.category}
                 </span>
               </div>
