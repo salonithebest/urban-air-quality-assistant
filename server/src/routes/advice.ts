@@ -1,3 +1,8 @@
+/**
+ * @file advice.ts
+ * @description API route handler for family health action plan synthesis.
+ */
+
 import { Router } from "express";
 import { AdviceRequestSchema, type AdviceRequest } from "../schemas/index.js";
 import { validateBody } from "../middleware/validate.js";
@@ -7,16 +12,29 @@ import { generateAdviceWording } from "../services/geminiService.js";
 
 export const adviceRouter = Router();
 
+// In-memory cache for CO2 estimations to reduce latency
+const co2Cache = new Map<string, ReturnType<typeof estimateCo2>>();
+function getCachedCo2(routineChoices: AdviceRequest["routineChoices"]) {
+  const key = JSON.stringify(routineChoices);
+  const cached = co2Cache.get(key);
+  if (cached) return cached;
+  const computed = estimateCo2(routineChoices);
+  if (co2Cache.size > 200) co2Cache.clear();
+  co2Cache.set(key, computed);
+  return computed;
+}
+
 adviceRouter.post(
   "/advice",
   adviceRateLimiter,
   validateBody(AdviceRequestSchema),
   async (req, res, next): Promise<void> => {
     try {
-      const adviceRequest = req.body as AdviceRequest;
+      // Clean access from validated body on res.locals without mutating req.body
+      const adviceRequest = (res.locals.validatedBody ?? req.body) as AdviceRequest;
 
-      // 1. Calculate CO2 savings deterministically (zero Gemini involvement)
-      const co2Estimate = estimateCo2(adviceRequest.routineChoices);
+      // 1. Calculate CO2 savings deterministically with in-memory caching
+      const co2Estimate = getCachedCo2(adviceRequest.routineChoices);
 
       // 2. Call Gemini for language phrasing (passing the pre-computed CO2 & AQI)
       const advice = await generateAdviceWording(adviceRequest, co2Estimate);

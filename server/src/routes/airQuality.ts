@@ -25,11 +25,12 @@ airQualityRouter.get(
   validateQuery(AirQualityQuerySchema),
   async (req, res, next): Promise<void> => {
     try {
-      const { lat, lon, city } = req.query as unknown as {
+      const queryData = (res.locals.validatedQuery ?? req.query) as unknown as {
         lat: number;
         lon: number;
         city?: string;
       };
+      const { lat, lon, city } = queryData;
 
       const cacheKey = `${lat.toFixed(4)},${lon.toFixed(4)}`;
       const now = Date.now();

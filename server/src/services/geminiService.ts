@@ -28,6 +28,21 @@ export const GEMINI_MODEL_NAME = "gemini-2.0-flash";
 const adviceCache = new Map<string, { data: AdviceResponse; expiresAt: number }>();
 const ADVICE_CACHE_TTL_MS = 15 * 60 * 1000;
 
+/**
+ * Sanitizes and whitelists user-provided text inputs before embedding into LLM prompts.
+ * Strips delimiter characters, prompt injection patterns, and control characters to prevent LLM manipulation.
+ */
+export function sanitizePromptText(value: string | undefined | null, maxLength = 80): string {
+  if (!value || typeof value !== "string") return "";
+  return value
+    .replace(/[\x00-\x1F\x7F]/g, "")
+    .replace(/[`${}\\[\]"']/g, "")
+    .replace(/(?:ignore|disregard)\s+(?:all\s+)?(?:previous\s+)?(?:instructions|prompts)/gi, "")
+    .replace(/(?:system\s*prompt|system\s*override|admin\s*mode)/gi, "")
+    .trim()
+    .slice(0, maxLength);
+}
+
 function computeCacheKey(req: AdviceRequest): string {
   const roles = (req.familyProfile?.members || []).map((m) => m.role).sort().join(",");
   const routines = (req.routineChoices || []).map((r) => r.activityType).sort().join(",");
@@ -49,6 +64,16 @@ export async function generateAdviceWording(
   // Handle boundary state of empty members
   const members = request.familyProfile?.members || [];
   const routines = request.routineChoices || [];
+
+  // Security: Sanitize all user-originating fields to prevent prompt-injection attacks
+  const sanitizedCity = sanitizePromptText(request.aqiSnapshot.city, 60);
+  const sanitizedCategory = sanitizePromptText(request.aqiSnapshot.category, 30);
+  const sanitizedProminent = sanitizePromptText(request.aqiSnapshot.prominentPollutant, 20);
+  const sanitizedMembers = members.map((m) => ({
+    id: sanitizePromptText(m.id, 40),
+    name: sanitizePromptText(m.name, 40),
+    role: m.role,
+  }));
 
   // If no Gemini key is provided, use reliable hyper-specific fallback
   if (!env.GEMINI_API_KEY || env.GEMINI_API_KEY === "your_gemini_api_key_here") {
@@ -76,9 +101,9 @@ You are an expert, family-focused urban air quality and environmental health spe
 You provide highly concrete, supportive, non-prescriptive, time-slotted routines and indoor air quality recommendations.
 
 CRITICAL GROUNDING INSTRUCTIONS:
-1. STRICT LOCALITY GROUNDING: The active locality is ONLY "${request.aqiSnapshot.city}". Do NOT mention or substitute any other city, district, or state.
-2. STRICT AQI GROUNDING: The National AQI is ALREADY computed deterministically via CPCB breakpoints as ${request.aqiSnapshot.aqi} (${request.aqiSnapshot.category}). Do NOT cite, alter, or recalculate any other AQI score.
-3. DOMINANT POLLUTANT: The prominent driver is ${request.aqiSnapshot.prominentPollutant}.
+1. STRICT LOCALITY GROUNDING: The active locality is ONLY "${sanitizedCity}". Do NOT mention or substitute any other city, district, or state.
+2. STRICT AQI GROUNDING: The National AQI is ALREADY computed deterministically via CPCB breakpoints as ${request.aqiSnapshot.aqi} (${sanitizedCategory}). Do NOT cite, alter, or recalculate any other AQI score.
+3. DOMINANT POLLUTANT: The prominent driver is ${sanitizedProminent}.
    Sub-indices across criteria pollutants: ${subIndicesSummary || "Standard 6-parameter monitoring"}.
 4. DETERMINISTIC CO₂ METRICS:
    - Solo car baseline: ${co2Estimate.baselineKgPerDay} kg/day
@@ -88,7 +113,7 @@ CRITICAL GROUNDING INSTRUCTIONS:
    Do NOT recalculate or invent any carbon numbers.
 5. HOUSEHOLD MEMBERS:
    You MUST generate personalized guidance for EACH member listed below:
-   ${members.map((m) => `- ID: "${m.id}", Name: "${m.name}", Role: "${m.role}"`).join("\n") || "No members provided."}
+   ${sanitizedMembers.map((m) => `- ID: "${m.id}", Name: "${m.name}", Role: "${m.role}"`).join("\n") || "No members provided."}
    Use supportive, non-prescriptive phrasing. Distinguish physiological vulnerability:
    - Infants / Children: rapid cadence, lung alveoli development, peak exposure hours.
    - Seniors / Cardiac / Asthmatic: systemic vascular oxidative stress, airway hyper-reactivity, indoor buffer zones.
@@ -104,7 +129,7 @@ Output MUST be valid JSON adhering strictly to this schema:
     {
       "memberId": "exact string matching input member id",
       "memberName": "exact string matching input member name",
-      "healthImpact": "supportive, physiological explanation tailored to ${request.aqiSnapshot.city}'s AQI ${request.aqiSnapshot.aqi} (${request.aqiSnapshot.category}) dominated by ${request.aqiSnapshot.prominentPollutant}",
+      "healthImpact": "supportive, physiological explanation tailored to ${sanitizedCity}'s AQI ${request.aqiSnapshot.aqi} (${sanitizedCategory}) dominated by ${sanitizedProminent}",
       "personalTips": [
         "Time-slotted actionable precaution (e.g. morning window timing, mask specification, hydration)",
         "Specific indoor / medication buffer recommendation",
@@ -113,12 +138,12 @@ Output MUST be valid JSON adhering strictly to this schema:
     }
   ],
   "routineSuggestions": [
-    "Concrete commute departure and route buffer recommendation for ${request.aqiSnapshot.city}",
+    "Concrete commute departure and route buffer recommendation for ${sanitizedCity}",
     "Specific mode-switch insight explaining exposure reduction from their current choices",
     "Tailpipe exposure mitigation during peak congestion hours"
   ],
   "indoorTips": [
-    "Specific window management and HEPA air purifier protocol based on outdoor ${request.aqiSnapshot.category} air",
+    "Specific window management and HEPA air purifier protocol based on outdoor ${sanitizedCategory} air",
     "Wet-surface cleaning and particulate suppression advice (preventing dust resuspension)",
     "Indoor plant care or humidity balance tip"
   ]
@@ -127,14 +152,14 @@ Output MUST be valid JSON adhering strictly to this schema:
 SNAPSHOT DATA:
 ${JSON.stringify(
   {
-    locality: request.aqiSnapshot.city,
+    locality: sanitizedCity,
     lat: request.aqiSnapshot.lat,
     lon: request.aqiSnapshot.lon,
     aqi: request.aqiSnapshot.aqi,
-    category: request.aqiSnapshot.category,
-    prominentPollutant: request.aqiSnapshot.prominentPollutant,
+    category: sanitizedCategory,
+    prominentPollutant: sanitizedProminent,
     subIndices: request.aqiSnapshot.pollutants,
-    householdMembers: members,
+    householdMembers: sanitizedMembers,
     commuteLegs: routines,
     co2Metrics: co2Estimate,
     indoorContext: request.indoorContext,
@@ -158,8 +183,10 @@ ${JSON.stringify(
 
     adviceCache.set(cacheKey, { data: adviceResponse, expiresAt: now + ADVICE_CACHE_TTL_MS });
     return adviceResponse;
-  } catch (err) {
-    console.warn("Gemini API call failed, using deterministic fallback advice:", err);
+  } catch (err: unknown) {
+    if (process.env.NODE_ENV === "development") {
+      console.warn("Gemini API call failed, using deterministic fallback advice:", err);
+    }
     const fallback = generateDeterministicFallback(request, co2Estimate);
     return fallback;
   }
