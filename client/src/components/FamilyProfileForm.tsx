@@ -12,13 +12,13 @@ interface FamilyProfileFormProps {
 }
 
 const ROLES: { value: FamilyRole; label: string; badge: string; isHighRisk?: boolean }[] = [
-  { value: "infant", label: "Infant (0–2 yrs)", badge: "bg-purple-500/20 text-purple-300 border-purple-500/40", isHighRisk: true },
-  { value: "child", label: "Child (3–12 yrs)", badge: "bg-cyan-500/20 text-cyan-300 border-cyan-500/40", isHighRisk: true },
-  { value: "senior", label: "Senior Citizen (60+ yrs)", badge: "bg-rose-500/20 text-rose-300 border-rose-500/40", isHighRisk: true },
-  { value: "asthmatic", label: "Asthmatic / Respiratory", badge: "bg-red-500/20 text-red-300 border-red-500/40", isHighRisk: true },
-  { value: "cardiac", label: "Cardiac / Heart condition", badge: "bg-amber-500/20 text-amber-300 border-amber-500/40", isHighRisk: true },
-  { value: "pregnant", label: "Pregnant", badge: "bg-pink-500/20 text-pink-300 border-pink-500/40", isHighRisk: true },
-  { value: "adult", label: "Healthy Adult", badge: "bg-slate-800 text-slate-300 border-slate-700" },
+  { value: "infant", label: "Infant (0–2 yrs)", badge: "bg-purple-50 text-purple-700 border-purple-200", isHighRisk: true },
+  { value: "child", label: "Child (3–12 yrs)", badge: "bg-cyan-50 text-cyan-700 border-cyan-200", isHighRisk: true },
+  { value: "senior", label: "Senior Citizen (60+ yrs)", badge: "bg-rose-50 text-rose-700 border-rose-200", isHighRisk: true },
+  { value: "asthmatic", label: "Asthmatic / Respiratory", badge: "bg-red-50 text-red-700 border-red-200", isHighRisk: true },
+  { value: "cardiac", label: "Cardiac / Heart condition", badge: "bg-amber-50 text-amber-700 border-amber-200", isHighRisk: true },
+  { value: "pregnant", label: "Pregnant", badge: "bg-pink-50 text-pink-700 border-pink-200", isHighRisk: true },
+  { value: "adult", label: "Healthy Adult", badge: "bg-slate-100 text-slate-700 border-slate-200" },
 ];
 
 function getSensitivityNote(role: FamilyRole, aqi: number = 138, category: string = "Moderately Polluted", prominent: string = "PM₂.₅"): string {
@@ -79,30 +79,30 @@ export const FamilyProfileForm: React.FC<FamilyProfileFormProps> = ({
   ).length;
 
   return (
-    <div className="cyber-panel rounded-2xl p-5 sm:p-6 flex flex-col justify-between">
+    <div className="glass-card rounded-3xl p-5 sm:p-6 flex flex-col justify-between">
       <div>
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <Users className="w-5 h-5 text-indigo-400" />
-            <h3 className="font-extrabold text-white text-lg tracking-tight">
+            <Users className="w-5 h-5 text-indigo-600" />
+            <h3 className="font-extrabold text-slate-900 text-lg tracking-tight">
               Household Vulnerability Profile
             </h3>
           </div>
 
           <div className="flex items-center gap-2">
             {highRiskCount > 0 && (
-              <span className="text-[11px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/40 px-2.5 py-0.5 rounded-full flex items-center gap-1">
-                <ShieldAlert className="w-3 h-3 text-rose-400" />
+              <span className="text-[11px] font-bold bg-rose-50 text-rose-700 border border-rose-200 px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                <ShieldAlert className="w-3 h-3 text-rose-500" />
                 {highRiskCount} High Risk
               </span>
             )}
-            <span className="text-xs font-semibold bg-slate-800 text-slate-300 px-2.5 py-0.5 rounded-full border border-slate-700">
+            <span className="text-xs font-semibold bg-white border border-slate-200 text-slate-700 px-2.5 py-0.5 rounded-full shadow-2xs">
               {members.length} / 10 Members
             </span>
           </div>
         </div>
 
-        <p className="text-xs text-slate-400 mb-4 leading-relaxed">
+        <p className="text-xs text-slate-500 mb-4 leading-relaxed font-medium">
           Click any family member below to open their vulnerability assessment &amp; active AQI sensitivity tier.
         </p>
 
@@ -122,33 +122,33 @@ export const FamilyProfileForm: React.FC<FamilyProfileFormProps> = ({
               return (
                 <div
                   key={m.id}
-                  className="rounded-xl border border-slate-800 bg-slate-900/90 overflow-hidden transition-all duration-200"
+                  className="rounded-2xl border border-slate-200/90 bg-white shadow-2xs overflow-hidden transition-all duration-200"
                 >
                   {/* Compact Header: Name + Dropdown Toggle (Category Hidden Until Expanded) */}
                   <div
                     onClick={() => toggleExpand(m.id)}
-                    className="flex items-center justify-between px-3.5 py-2.5 cursor-pointer hover:bg-slate-800/60 transition-colors select-none"
+                    className="flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-slate-50/80 transition-colors select-none"
                   >
                     <div className="flex items-center gap-2.5">
-                      <div className="w-6 h-6 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
-                        <User className="w-3.5 h-3.5" />
+                      <div className="w-7 h-7 rounded-xl bg-teal-50 border border-teal-200 flex items-center justify-center text-teal-700">
+                        <User className="w-4 h-4" />
                       </div>
-                      <span className="font-bold text-white text-xs sm:text-sm">{m.name}</span>
+                      <span className="font-extrabold text-slate-900 text-sm">{m.name}</span>
                     </div>
 
                     <div className="flex items-center gap-2">
-                      <span className="text-[10px] text-slate-500 font-semibold hidden sm:inline">
+                      <span className="text-[11px] text-slate-400 font-semibold hidden sm:inline">
                         {isExpanded ? "Hide profile" : "View profile"}
                       </span>
                       <button
                         type="button"
-                        className="p-1 text-slate-400 hover:text-emerald-400 transition-colors"
+                        className="p-1 text-slate-500 hover:text-teal-600 transition-colors"
                         aria-label={isExpanded ? "Collapse member" : "Expand member"}
                       >
                         {isExpanded ? (
-                          <ChevronUp className="w-4 h-4 text-emerald-400" />
+                          <ChevronUp className="w-4 h-4 text-teal-600" />
                         ) : (
-                          <ChevronDown className="w-4 h-4 text-slate-400" />
+                          <ChevronDown className="w-4 h-4 text-slate-500" />
                         )}
                       </button>
                     </div>
@@ -156,14 +156,14 @@ export const FamilyProfileForm: React.FC<FamilyProfileFormProps> = ({
 
                   {/* Expandable Dropdown Content: Revealed ONLY when clicked */}
                   {isExpanded && (
-                    <div className="px-3.5 py-3 border-t border-slate-800/80 bg-slate-950/60 space-y-2.5 animate-fadeIn">
+                    <div className="px-4 py-3.5 border-t border-slate-100 bg-slate-50/60 space-y-3">
                       <div className="flex items-center justify-between flex-wrap gap-2">
                         <div className="flex items-center gap-2">
-                          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
                             Vulnerability Tier:
                           </span>
                           <span
-                            className={`text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md border ${roleObj.badge}`}
+                            className={`text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-md border ${roleObj.badge}`}
                           >
                             {roleObj.label}
                           </span>
@@ -175,7 +175,7 @@ export const FamilyProfileForm: React.FC<FamilyProfileFormProps> = ({
                             e.stopPropagation();
                             onRemoveMember(m.id);
                           }}
-                          className="px-2.5 py-1 text-[11px] font-bold text-rose-400 hover:text-rose-300 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 rounded-lg flex items-center gap-1.5 transition-colors cursor-pointer"
+                          className="px-2.5 py-1 text-[11px] font-bold text-rose-700 hover:text-rose-800 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-lg flex items-center gap-1.5 transition-colors cursor-pointer"
                         >
                           <Trash2 className="w-3 h-3" />
                           <span>Remove</span>
@@ -183,12 +183,12 @@ export const FamilyProfileForm: React.FC<FamilyProfileFormProps> = ({
                       </div>
 
                       {/* Active CPCB AQI Sensitivity Note */}
-                      <div className="text-xs text-slate-300 bg-slate-900/80 border border-slate-800 rounded-lg p-2.5 leading-relaxed">
-                        <div className="flex items-center gap-1.5 text-emerald-400 font-bold text-[10px] uppercase tracking-wider mb-1">
-                          <HeartPulse className="w-3 h-3 text-rose-400" />
+                      <div className="text-xs text-slate-700 bg-white border border-slate-200/80 rounded-xl p-3 leading-relaxed shadow-2xs">
+                        <div className="flex items-center gap-1.5 text-teal-800 font-bold text-[10px] uppercase tracking-wider mb-1">
+                          <HeartPulse className="w-3.5 h-3.5 text-rose-500" />
                           <span>Sensitivity for AQI {activeAqi} ({activeCategory}):</span>
                         </div>
-                        <p className="text-[11px] text-slate-300">{sensitivityNote}</p>
+                        <p className="text-xs text-slate-600 font-medium">{sensitivityNote}</p>
                       </div>
                     </div>
                   )}
@@ -197,8 +197,8 @@ export const FamilyProfileForm: React.FC<FamilyProfileFormProps> = ({
             })}
           </div>
         ) : (
-          <div className="p-3.5 rounded-xl bg-slate-900/60 border border-dashed border-slate-700 text-xs text-slate-400 mb-4 flex items-center gap-2">
-            <UserPlus className="w-4 h-4 text-emerald-400" />
+          <div className="p-4 rounded-2xl bg-white border border-dashed border-slate-300 text-xs text-slate-500 mb-4 flex items-center gap-2 font-medium">
+            <UserPlus className="w-4 h-4 text-teal-600" />
             <span>No family members added yet. Add a family member below (e.g. child, senior, asthmatic) to tailor protection protocols.</span>
           </div>
         )}
@@ -208,24 +208,24 @@ export const FamilyProfileForm: React.FC<FamilyProfileFormProps> = ({
       {members.length < 10 && (
         <form
           onSubmit={handleSubmit}
-          className="pt-4 border-t border-slate-800 flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5"
+          className="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5"
         >
           <input
             type="text"
             placeholder="Name (e.g. Aarav, Dadi)..."
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="flex-1 px-3 py-2 text-xs cyber-input rounded-xl focus:outline-none"
+            className="flex-1 px-3.5 py-2.5 text-xs glass-input rounded-xl focus:outline-none font-medium"
             maxLength={30}
           />
 
           <select
             value={role}
             onChange={(e) => setRole(e.target.value as FamilyRole)}
-            className="px-3 py-2 text-xs cyber-input rounded-xl font-medium cursor-pointer"
+            className="px-3 py-2.5 text-xs glass-input rounded-xl font-bold text-slate-800 cursor-pointer"
           >
             {ROLES.map((r) => (
-              <option key={r.value} value={r.value} className="bg-[#0b1120] text-white">
+              <option key={r.value} value={r.value} className="bg-white text-slate-900">
                 {r.label}
               </option>
             ))}
@@ -234,7 +234,7 @@ export const FamilyProfileForm: React.FC<FamilyProfileFormProps> = ({
           <button
             type="submit"
             disabled={!name.trim()}
-            className="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 disabled:opacity-40 text-slate-950 font-black text-xs rounded-xl flex items-center justify-center gap-1.5 transition-all active:scale-95 shadow-md shadow-emerald-500/20 cursor-pointer"
+            className="px-4 py-2.5 bg-teal-600 hover:bg-teal-700 disabled:opacity-40 text-white font-black text-xs rounded-xl flex items-center justify-center gap-1.5 transition-all active:scale-95 shadow-md shadow-teal-600/20 cursor-pointer"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>Add</span>

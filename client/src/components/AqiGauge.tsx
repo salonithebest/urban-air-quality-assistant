@@ -15,53 +15,50 @@ export const AqiGauge: React.FC<AqiGaugeProps> = ({ data }) => {
   const aqiPercentage = Math.min(100, Math.max(0, (data.aqi / 500) * 100));
 
   return (
-    <div className="cyber-panel-glow rounded-3xl p-6 sm:p-8 mb-6 relative overflow-hidden">
-      {/* Background ambient lighting */}
-      <div className="absolute top-0 right-0 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
-
+    <div className="glass-card-glow rounded-3xl p-6 sm:p-8 mb-6 relative overflow-hidden shadow-lg">
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative z-10">
         <div className="flex-1">
           {/* Status Badges */}
           <div className="flex flex-wrap items-center gap-2.5 mb-3.5">
             <span
-              className="px-3.5 py-1 rounded-full text-xs font-black uppercase tracking-wider border shadow-sm"
+              className="px-3.5 py-1 rounded-full text-xs font-black uppercase tracking-wider border shadow-xs"
               style={{
-                backgroundColor: `${theme.accent}20`,
+                backgroundColor: `${theme.accent}15`,
                 color: theme.accent,
-                borderColor: `${theme.accent}60`,
+                borderColor: `${theme.accent}40`,
               }}
             >
               {data.category}
             </span>
 
-            <span className="text-xs text-slate-300 font-semibold bg-slate-900/80 border border-slate-700/80 px-3 py-1 rounded-full flex items-center gap-2">
+            <span className="text-xs text-slate-700 font-bold bg-white/90 border border-slate-200 px-3 py-1 rounded-full flex items-center gap-2 shadow-2xs">
               <span
-                className="w-2.5 h-2.5 rounded-full animate-ping"
+                className="w-2.5 h-2.5 rounded-full"
                 style={{ backgroundColor: theme.accent }}
               />
-              Prominent Pollutant: <strong className="text-white font-bold">{prominent}</strong>
+              Prominent Pollutant: <strong className="text-slate-900 font-extrabold">{prominent}</strong>
             </span>
 
-            <span className="text-xs text-slate-400 bg-slate-900/60 border border-slate-800 px-3 py-1 rounded-full flex items-center gap-1.5">
+            <span className="text-xs text-slate-500 bg-white/70 border border-slate-200 px-3 py-1 rounded-full flex items-center gap-1.5 font-medium">
               <Clock className="w-3.5 h-3.5 text-slate-400" />
               {new Date(data.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
             </span>
           </div>
 
-          <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight flex items-center gap-3">
-            <Activity className="w-6 h-6 text-emerald-400 shrink-0" />
+          <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight flex items-center gap-3">
+            <Activity className="w-6 h-6 text-teal-600 shrink-0" />
             <span>Estimated AQI (CPCB method, hourly model data) for {data.city}</span>
           </h2>
 
-          <p className="text-sm mt-2.5 text-slate-300 max-w-2xl leading-relaxed font-normal">
+          <p className="text-sm mt-2.5 text-slate-600 max-w-2xl leading-relaxed font-medium">
             {theme.advisory}
           </p>
         </div>
 
         {/* CPCB Score Display */}
-        <div className="cyber-panel rounded-2xl p-5 sm:px-8 sm:py-6 flex flex-col items-center justify-center min-w-[190px] shrink-0 border border-emerald-500/30 relative">
+        <div className="glass-card rounded-2xl p-5 sm:px-8 sm:py-6 flex flex-col items-center justify-center min-w-[190px] shrink-0 border border-teal-200 shadow-xs">
           <span className="text-[11px] font-extrabold uppercase tracking-widest text-slate-400 flex items-center gap-1.5 mb-1">
-            <Gauge className="w-3.5 h-3.5 text-emerald-400" /> CPCB AQI
+            <Gauge className="w-3.5 h-3.5 text-teal-600" /> CPCB AQI
           </span>
           <div className="flex items-baseline gap-1.5">
             <span
@@ -73,9 +70,9 @@ export const AqiGauge: React.FC<AqiGaugeProps> = ({ data }) => {
             <span className="text-xs font-bold text-slate-400">/ 500</span>
           </div>
           <span
-            className="text-xs font-black uppercase tracking-wider mt-1 px-2.5 py-0.5 rounded-full"
+            className="text-xs font-black uppercase tracking-wider mt-1 px-3 py-0.5 rounded-full"
             style={{
-              backgroundColor: `${theme.accent}20`,
+              backgroundColor: `${theme.accent}15`,
               color: theme.accent,
             }}
           >
@@ -86,17 +83,17 @@ export const AqiGauge: React.FC<AqiGaugeProps> = ({ data }) => {
 
       {/* Gradient Spectrum Bar with active indicator */}
       <div className="mt-8 relative z-10">
-        <div className="flex justify-between text-[11px] font-bold text-slate-400 mb-2">
-          <span className="text-emerald-400">0 Good</span>
-          <span className="text-cyan-400">100 Sat.</span>
-          <span className="text-amber-400">200 Mod.</span>
-          <span className="text-orange-400">300 Poor</span>
-          <span className="text-rose-400">400 V.Poor</span>
-          <span className="text-red-500">500 Severe</span>
+        <div className="flex justify-between text-[11px] font-bold text-slate-500 mb-2">
+          <span className="text-emerald-600">0 Good</span>
+          <span className="text-cyan-600">100 Sat.</span>
+          <span className="text-amber-600">200 Mod.</span>
+          <span className="text-orange-600">300 Poor</span>
+          <span className="text-rose-600">400 V.Poor</span>
+          <span className="text-red-700">500 Severe</span>
         </div>
 
         {/* Gradient bar track */}
-        <div className="relative h-3 w-full rounded-full overflow-visible bg-slate-800">
+        <div className="relative h-3 w-full rounded-full overflow-visible bg-slate-200">
           <div
             className="h-full rounded-full"
             style={{
@@ -107,15 +104,15 @@ export const AqiGauge: React.FC<AqiGaugeProps> = ({ data }) => {
 
           {/* Indicator Marker */}
           <div
-            className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-5 h-5 rounded-full bg-white border-2 border-slate-900 shadow-[0_0_15px_rgba(255,255,255,0.8)] transition-all duration-500"
+            className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-5 h-5 rounded-full bg-white border-2 border-slate-900 shadow-md transition-all duration-500"
             style={{ left: `${aqiPercentage}%` }}
           />
         </div>
 
         {/* Linear interpolation note */}
-        <div className="mt-3.5 flex flex-col sm:flex-row items-start sm:items-center justify-between text-[11px] text-slate-400">
+        <div className="mt-3.5 flex flex-col sm:flex-row items-start sm:items-center justify-between text-[11px] text-slate-500 font-medium">
           <span className="flex items-center gap-1.5">
-            <span className="text-amber-400 font-bold">ℹ Formula:</span> Linear interpolation: I = ((I_hi - I_lo) / (C_hi - C_lo)) * (C - C_lo) + I_lo
+            <span className="text-amber-700 font-bold">ℹ Formula:</span> Linear interpolation: I = ((I_hi - I_lo) / (C_hi - C_lo)) * (C - C_lo) + I_lo
           </span>
           <span className="text-slate-500 mt-1 sm:mt-0 font-mono">
             O₃ &amp; CO use 8-hr rolling window standards

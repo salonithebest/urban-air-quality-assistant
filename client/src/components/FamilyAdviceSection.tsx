@@ -11,9 +11,9 @@ export const FamilyAdviceSection: React.FC<FamilyAdviceSectionProps> = ({
 }) => {
   if (!memberAdvice || memberAdvice.length === 0) {
     return (
-      <div className="cyber-panel rounded-2xl p-6 mb-6 text-center text-slate-400">
-        <UserCheck className="w-8 h-8 text-slate-500 mx-auto mb-2" />
-        <p className="text-sm font-semibold text-slate-300">No family member advice generated yet.</p>
+      <div className="glass-card rounded-2xl p-6 mb-6 text-center text-slate-500">
+        <UserCheck className="w-8 h-8 text-slate-400 mx-auto mb-2" />
+        <p className="text-sm font-semibold text-slate-700">No family member advice generated yet.</p>
         <p className="text-xs text-slate-500 mt-1">Add members to your household profile to synthesize custom health protocols.</p>
       </div>
     );
@@ -23,20 +23,20 @@ export const FamilyAdviceSection: React.FC<FamilyAdviceSectionProps> = ({
     <div className="mb-8">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2.5">
-          <div className="p-1.5 rounded-lg bg-emerald-500/20 text-emerald-300">
+          <div className="p-1.5 rounded-xl bg-teal-100 text-teal-800">
             <UserCheck className="w-5 h-5" />
           </div>
           <div>
-            <h3 className="font-black text-white text-xl tracking-tight">
+            <h3 className="font-black text-slate-900 text-xl tracking-tight">
               Personalized Family Member Health Protocols
             </h3>
-            <p className="text-xs text-slate-400 mt-0.5">
+            <p className="text-xs text-slate-500 mt-0.5 font-medium">
               Targeted biological vulnerability mitigation and daily exposure scheduling per household profile.
             </p>
           </div>
         </div>
 
-        <span className="text-xs font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-3 py-1 rounded-full hidden sm:inline-block">
+        <span className="text-xs font-bold text-teal-800 bg-teal-50 border border-teal-200 px-3 py-1 rounded-full hidden sm:inline-block">
           {memberAdvice.length} {memberAdvice.length === 1 ? "Member Protocol" : "Member Protocols"}
         </span>
       </div>
@@ -46,42 +46,42 @@ export const FamilyAdviceSection: React.FC<FamilyAdviceSectionProps> = ({
         {memberAdvice.map((advice) => (
           <div
             key={advice.memberId}
-            className="cyber-panel-glow rounded-3xl p-6 sm:p-7 flex flex-col justify-between border border-emerald-500/25 hover:border-emerald-500/50 transition-all shadow-xl"
+            className="glass-card rounded-3xl p-6 sm:p-7 flex flex-col justify-between shadow-sm"
           >
             <div>
               {/* Member Header */}
-              <div className="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
-                <span className="font-black text-white text-lg tracking-tight flex items-center gap-2.5">
-                  <HeartPulse className="w-5 h-5 text-rose-400 shrink-0" />
+              <div className="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
+                <span className="font-black text-slate-900 text-lg tracking-tight flex items-center gap-2.5">
+                  <HeartPulse className="w-5 h-5 text-rose-500 shrink-0" />
                   <span>{advice.memberName}</span>
                 </span>
-                <span className="text-[11px] font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 px-3 py-1 rounded-full flex items-center gap-1.5">
-                  <Sparkles className="w-3 h-3 text-emerald-400" /> Action Protocol
+                <span className="text-[11px] font-black uppercase tracking-wider bg-teal-50 text-teal-800 border border-teal-200 px-3 py-1 rounded-full flex items-center gap-1.5 shadow-2xs">
+                  <Sparkles className="w-3 h-3 text-teal-600" /> Action Protocol
                 </span>
               </div>
 
               {/* Biological Health Vulnerability Assessment */}
-              <div className="text-xs sm:text-sm text-rose-200 bg-rose-500/10 border border-rose-500/30 rounded-2xl p-4 mb-4 flex items-start gap-3">
-                <ShieldAlert className="w-5 h-5 text-rose-400 shrink-0 mt-0.5" />
+              <div className="text-xs sm:text-sm text-rose-900 bg-rose-50/80 border border-rose-200 rounded-2xl p-4 mb-4 flex items-start gap-3">
+                <ShieldAlert className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />
                 <div className="leading-relaxed">
-                  <span className="text-[10px] font-black uppercase tracking-widest text-rose-400 block mb-1">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-rose-700 block mb-1">
                     Physiological Exposure Assessment
                   </span>
-                  <p className="text-slate-200">{advice.healthImpact}</p>
+                  <p className="text-slate-700 font-medium">{advice.healthImpact}</p>
                 </div>
               </div>
 
               {/* Specific Safeguards & Actionable Countermeasures */}
               <div className="space-y-2.5">
-                <span className="text-[10px] font-black uppercase tracking-widest text-emerald-400 block mb-1">
+                <span className="text-[10px] font-black uppercase tracking-widest text-teal-800 block mb-1">
                   Specific Safeguards &amp; Time-Slotted Routines
                 </span>
                 {advice.personalTips.map((tip, idx) => (
                   <div
                     key={idx}
-                    className="flex items-start gap-3 text-xs sm:text-sm text-slate-200 leading-relaxed bg-slate-900/60 border border-slate-800/80 rounded-xl p-3 hover:border-slate-700 transition-colors"
+                    className="flex items-start gap-3 text-xs sm:text-sm text-slate-700 leading-relaxed bg-white border border-slate-200/90 rounded-2xl p-3.5 shadow-2xs font-medium"
                   >
-                    <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                    <CheckCircle2 className="w-4 h-4 text-teal-600 shrink-0 mt-0.5" />
                     <span>{tip}</span>
                   </div>
                 ))}

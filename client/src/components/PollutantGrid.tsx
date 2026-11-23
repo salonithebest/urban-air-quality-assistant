@@ -12,16 +12,16 @@ export const PollutantGrid: React.FC<PollutantGridProps> = ({ pollutants }) => {
     <div className="mb-6">
       <div className="flex items-center justify-between mb-3.5 px-1">
         <div className="flex items-center gap-2">
-          <Wind className="w-4 h-4 text-emerald-400" />
-          <h3 className="font-extrabold text-white text-base sm:text-lg tracking-tight">
+          <Wind className="w-4 h-4 text-teal-600" />
+          <h3 className="font-extrabold text-slate-900 text-base sm:text-lg tracking-tight">
             CPCB Pollutant Concentrations &amp; Sub-Indices
           </h3>
-          <span className="text-[11px] bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 px-2.5 py-0.5 rounded-full font-bold">
+          <span className="text-[11px] bg-teal-50 text-teal-800 border border-teal-200 px-2.5 py-0.5 rounded-full font-bold">
             {pollutants.length} Parameters
           </span>
         </div>
 
-        <span className="text-xs text-slate-400 hidden sm:inline">
+        <span className="text-xs text-slate-500 font-medium hidden sm:inline">
           Sub-index &gt; 100 exceeds national ambient standard
         </span>
       </div>
@@ -42,11 +42,11 @@ export const PollutantGrid: React.FC<PollutantGridProps> = ({ pollutants }) => {
           return (
             <div
               key={p.pollutant}
-              className="cyber-panel rounded-2xl p-4 flex flex-col justify-between hover:border-emerald-500/50 transition-all"
+              className="glass-card rounded-2xl p-4 flex flex-col justify-between"
             >
               <div>
                 <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-xs font-black text-slate-200">
+                  <span className="text-xs font-black text-slate-800">
                     {name}
                   </span>
                   <span
@@ -57,10 +57,10 @@ export const PollutantGrid: React.FC<PollutantGridProps> = ({ pollutants }) => {
 
                 <div className="mt-2 flex items-baseline justify-between">
                   <div>
-                    <div className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+                    <div className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
                       {displayConc}
                     </div>
-                    <div className="text-[10px] text-slate-400 font-medium">
+                    <div className="text-[10px] text-slate-500 font-bold">
                       {p.unit}
                     </div>
                   </div>
@@ -79,9 +79,9 @@ export const PollutantGrid: React.FC<PollutantGridProps> = ({ pollutants }) => {
                 </div>
               </div>
 
-              <div className="mt-3 pt-2.5 border-t border-slate-800">
+              <div className="mt-3 pt-2.5 border-t border-slate-100">
                 <span
-                  className="text-[10px] font-extrabold block truncate uppercase tracking-wider"
+                  className="text-[10px] font-black block truncate uppercase tracking-wider"
                   style={{ color: theme.accent }}
                 >
                   {p.category}
