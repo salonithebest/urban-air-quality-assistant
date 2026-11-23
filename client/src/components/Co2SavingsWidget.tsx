@@ -1,3 +1,9 @@
+/**
+ * @file Co2SavingsWidget.tsx
+ * @description Deterministic carbon reduction and tree-years sequestration widget.
+ * Implements emission factors from India GHG Program and USDA Forest Service tree sequestration standards.
+ */
+
 import React from "react";
 import type { Co2Estimate, RoutineChoice } from "../types/index.js";
 import { calculateDeterministicCo2 } from "../utils/co2Calculator.js";
@@ -15,7 +21,6 @@ export const Co2SavingsWidget: React.FC<Co2SavingsWidgetProps> = ({
   // If active routineChoices are provided, compute live deterministic metrics
   const liveMetrics = routineChoices ? calculateDeterministicCo2(routineChoices) : null;
 
-  // Use live metrics if available, otherwise server estimate
   const baselineKgPerDay = liveMetrics
     ? liveMetrics.soloCarBaselineKg
     : serverEstimate?.baselineKgPerDay ?? 0;
@@ -42,11 +47,6 @@ export const Co2SavingsWidget: React.FC<Co2SavingsWidgetProps> = ({
     : serverEstimate?.annualTreeYears ??
       Math.round((savedKgPerYear / 21) * 10) / 10;
 
-  const equivalentTreeDays = liveMetrics
-    ? liveMetrics.equivalentTreeDays
-    : serverEstimate?.equivalentTreeDays ??
-      Math.round(annualTreeYears * 365 * 10) / 10;
-
   const sourceLabel = liveMetrics
     ? liveMetrics.sourceLabel
     : serverEstimate?.sourceLabel ?? "India GHG Program & TERI";
@@ -55,105 +55,104 @@ export const Co2SavingsWidget: React.FC<Co2SavingsWidgetProps> = ({
   const totalMinutes = liveMetrics ? liveMetrics.totalMinutes : 0;
 
   return (
-    <div className="glass-card-glow rounded-3xl p-6 sm:p-7 mb-6 relative overflow-hidden shadow-lg">
+    <section
+      className="glass-card-glow rounded-3xl p-6 sm:p-7 mb-6 relative overflow-hidden shadow-lg"
+      role="region"
+      aria-label="Deterministic Commute Carbon and Tree Sequestration Metrics"
+    >
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 border-b border-teal-100 pb-4">
         <div>
-          <div className="flex items-center gap-2">
-            <div className="p-1.5 rounded-xl bg-teal-100 text-teal-800">
-              <Leaf className="w-5 h-5" />
-            </div>
-            <h3 className="font-black text-xl text-slate-900 tracking-tight">
-              Deterministic Family CO₂ Savings Engine
-            </h3>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="p-1.5 rounded-xl bg-teal-100 text-teal-800">
+              <Leaf className="w-4 h-4 text-teal-700" aria-hidden="true" />
+            </span>
+            <span className="text-[11px] font-black uppercase tracking-widest text-teal-800">
+              Deterministic Climate Accounting
+            </span>
+            <span className="text-[10px] font-bold bg-teal-50 text-teal-800 border border-teal-200 px-2 py-0.5 rounded-full flex items-center gap-1">
+              <ShieldCheck className="w-3 h-3 text-teal-600" aria-hidden="true" /> Verified Baseline
+            </span>
           </div>
-          <p className="text-xs text-slate-600 mt-1 font-medium">
-            Pure mathematical calculation of emissions saved against standard solo petrol car transit (0.14 kg CO₂/km).
-            {totalKm > 0 && (
-              <span className="text-teal-700 font-bold ml-1">
-                Active commute: {totalKm.toFixed(1)} km across {totalMinutes} min.
-              </span>
-            )}
+
+          <h3 className="font-black text-slate-900 text-xl tracking-tight">
+            Commute Carbon Savings vs. Solo Petrol Car
+          </h3>
+          <p className="text-xs text-slate-500 mt-0.5 font-medium">
+            Based on {totalMinutes} min / {totalKm.toFixed(1)} km daily transit vs. baseline (0.14 kg CO₂/km).
           </p>
         </div>
 
-        <span className="text-[11px] bg-teal-50 border border-teal-200 text-teal-800 px-3 py-1 rounded-full font-black self-start sm:self-center shadow-2xs">
-          {sourceLabel}
+        <span className="text-xs font-bold text-teal-800 bg-teal-50 border border-teal-200 px-3.5 py-1.5 rounded-xl self-start sm:self-auto shadow-2xs">
+          Source: {sourceLabel}
         </span>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5">
+      {/* Primary Metrics Grid */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-5">
         {/* Solo Car Baseline */}
-        <div className="glass-card rounded-2xl p-4">
-          <div className="flex items-center justify-between text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
-            <span>Solo Car Baseline</span>
-            <Car className="w-3.5 h-3.5 text-slate-400" />
+        <div className="bg-white/80 border border-slate-200/90 rounded-2xl p-4 shadow-2xs">
+          <div className="flex items-center justify-between text-slate-400 mb-1">
+            <span className="text-[10px] font-black uppercase tracking-wider text-slate-500">
+              Solo Car Baseline
+            </span>
+            <Car className="w-3.5 h-3.5 text-slate-400" aria-hidden="true" />
           </div>
-          <div className="text-2xl sm:text-3xl font-black text-slate-900">
-            {baselineKgPerDay.toFixed(2)}{" "}
-            <span className="text-xs font-semibold text-slate-400">kg/day</span>
+          <div className="text-2xl sm:text-3xl font-black text-slate-700">
+            {baselineKgPerDay.toFixed(2)}
           </div>
-          <span className="text-[10px] text-slate-400 mt-1 block">
-            0.140 kg CO₂/km standard
-          </span>
+          <div className="text-[11px] text-slate-400 font-semibold mt-0.5">kg CO₂ / day</div>
         </div>
 
         {/* Your Routine Footprint */}
-        <div className="glass-card rounded-2xl p-4">
-          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1">
-            Your Routine Footprint
-          </span>
-          <div className="text-2xl sm:text-3xl font-black text-teal-700">
-            {optimisedKgPerDay.toFixed(2)}{" "}
-            <span className="text-xs font-semibold text-teal-600/70">kg/day</span>
+        <div className="bg-white/80 border border-slate-200/90 rounded-2xl p-4 shadow-2xs">
+          <div className="flex items-center justify-between text-slate-400 mb-1">
+            <span className="text-[10px] font-black uppercase tracking-wider text-teal-700">
+              Routine Footprint
+            </span>
+            <Leaf className="w-3.5 h-3.5 text-teal-600" aria-hidden="true" />
           </div>
-          <span className="text-[10px] text-slate-400 mt-1 block">
-            With low-carbon modes
-          </span>
+          <div className="text-2xl sm:text-3xl font-black text-teal-700">
+            {optimisedKgPerDay.toFixed(2)}
+          </div>
+          <div className="text-[11px] text-teal-600 font-semibold mt-0.5">kg CO₂ / day</div>
         </div>
 
         {/* Daily Carbon Cut */}
-        <div className="bg-teal-50/80 border border-teal-200 rounded-2xl p-4 shadow-2xs">
-          <div className="flex items-center gap-1 text-[10px] font-black text-teal-800 uppercase tracking-widest mb-1">
-            <ArrowDownRight className="w-3.5 h-3.5 text-teal-600" />
-            Daily Carbon Cut
+        <div className="bg-emerald-50/90 border border-emerald-200 rounded-2xl p-4 shadow-2xs">
+          <div className="flex items-center justify-between text-emerald-700 mb-1">
+            <span className="text-[10px] font-black uppercase tracking-wider">Daily Carbon Cut</span>
+            <ArrowDownRight className="w-3.5 h-3.5 text-emerald-600" aria-hidden="true" />
           </div>
-          <div className="text-2xl sm:text-3xl font-black text-teal-800">
-            {savedKgPerDay.toFixed(2)}{" "}
-            <span className="text-xs font-bold text-teal-700">kg/day</span>
+          <div className="text-2xl sm:text-3xl font-black text-emerald-800">
+            -{savedKgPerDay.toFixed(2)}
           </div>
-          <span className="text-[10px] text-teal-700 mt-1 block font-bold">
-            {percentReduction}% lower footprint ({savedKgPerYear.toFixed(1)} kg/yr)
-          </span>
+          <div className="text-[11px] text-emerald-700 font-bold mt-0.5">
+            {percentReduction}% cut vs. solo car
+          </div>
         </div>
 
         {/* Annual Sequestration */}
-        <div className="glass-card rounded-2xl p-4">
-          <div className="flex items-center gap-1 text-[10px] font-bold text-cyan-700 uppercase tracking-widest mb-1">
-            <Trees className="w-3.5 h-3.5" />
-            Annual Sequestration
+        <div className="bg-gradient-to-br from-teal-50 to-cyan-50 border border-teal-200 rounded-2xl p-4 shadow-2xs">
+          <div className="flex items-center justify-between text-teal-800 mb-1">
+            <span className="text-[10px] font-black uppercase tracking-wider">Annual Sequestration</span>
+            <Trees className="w-3.5 h-3.5 text-teal-600" aria-hidden="true" />
           </div>
-          <div className="text-2xl sm:text-3xl font-black text-cyan-800">
-            {annualTreeYears.toFixed(1)}{" "}
-            <span className="text-xs font-semibold text-cyan-600">tree-years</span>
+          <div className="text-2xl sm:text-3xl font-black text-teal-800">
+            {annualTreeYears}
           </div>
-          <span className="text-[10px] text-slate-500 mt-1 block font-medium">
-            = {equivalentTreeDays.toFixed(0)} tree-days ({annualTreeYears.toFixed(1)} mature trees/yr)
-          </span>
+          <div className="text-[11px] text-teal-700 font-bold mt-0.5">
+            tree-years / yr ({savedKgPerYear.toFixed(0)} kg CO₂)
+          </div>
         </div>
       </div>
 
-      {/* Explanatory Formula Footer */}
-      <div className="mt-4 pt-3.5 border-t border-teal-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-[11px] text-slate-600 font-medium">
-        <div className="flex items-center gap-1.5">
-          <Info className="w-3.5 h-3.5 text-teal-600 shrink-0" />
-          <span>
-            <strong>Formula:</strong> ({savedKgPerDay.toFixed(2)} kg/day × 365 days) ÷ 21 kg CO₂/tree/year = <strong>{annualTreeYears.toFixed(1)} mature tree-years</strong> of annual absorption.
-          </span>
-        </div>
-        <div className="flex items-center gap-1 text-slate-500 font-mono text-[10px]">
-          <ShieldCheck className="w-3 h-3 text-teal-600" /> USDA Forest Service 21 kg/tree/yr standard
-        </div>
+      {/* Explanatory Footer */}
+      <div className="flex items-center gap-2 text-[11px] text-slate-500 bg-white/70 border border-slate-200/80 rounded-xl px-3.5 py-2 font-medium">
+        <Info className="w-3.5 h-3.5 text-teal-600 shrink-0" aria-hidden="true" />
+        <span>
+          Annual sequestration is calculated via the USDA Forest Service benchmark (1 urban tree absorbs ~21 kg CO₂ per year). Calculations exclude Work from Home (0 km) travel.
+        </span>
       </div>
-    </div>
+    </section>
   );
 };

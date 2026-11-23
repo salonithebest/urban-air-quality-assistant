@@ -1,3 +1,9 @@
+/**
+ * @file PollutantGrid.tsx
+ * @description Accessible 6-criteria pollutant micro-card grid.
+ * Displays real-time measured concentrations and corresponding CPCB sub-indices.
+ */
+
 import React from "react";
 import type { PollutantReading } from "../types/index.js";
 import { AQI_CATEGORY_THEMES, POLLUTANT_NAMES } from "../utils/aqiColors.js";
@@ -9,10 +15,10 @@ interface PollutantGridProps {
 
 export const PollutantGrid: React.FC<PollutantGridProps> = ({ pollutants }) => {
   return (
-    <div className="mb-6">
+    <section className="mb-6" role="region" aria-label="CPCB Criteria Pollutant Concentrations and Sub-Indices">
       <div className="flex items-center justify-between mb-3.5 px-1">
         <div className="flex items-center gap-2">
-          <Wind className="w-4 h-4 text-teal-600" />
+          <Wind className="w-4 h-4 text-teal-600" aria-hidden="true" />
           <h3 className="font-extrabold text-slate-900 text-base sm:text-lg tracking-tight">
             CPCB Pollutant Concentrations &amp; Sub-Indices
           </h3>
@@ -26,7 +32,7 @@ export const PollutantGrid: React.FC<PollutantGridProps> = ({ pollutants }) => {
         </span>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5" role="list">
         {pollutants.map((p) => {
           const theme = AQI_CATEGORY_THEMES[p.category] || AQI_CATEGORY_THEMES["Moderately Polluted"];
           const name = POLLUTANT_NAMES[p.pollutant] || p.pollutant;
@@ -42,6 +48,8 @@ export const PollutantGrid: React.FC<PollutantGridProps> = ({ pollutants }) => {
           return (
             <div
               key={p.pollutant}
+              role="listitem"
+              aria-label={`${name}: ${displayConc} ${p.unit}, sub-index ${displaySubIndex}, status ${p.category}`}
               className="glass-card rounded-2xl p-4 flex flex-col justify-between"
             >
               <div>
@@ -52,6 +60,7 @@ export const PollutantGrid: React.FC<PollutantGridProps> = ({ pollutants }) => {
                   <span
                     className="w-2.5 h-2.5 rounded-full"
                     style={{ backgroundColor: theme.accent }}
+                    aria-hidden="true"
                   />
                 </div>
 
@@ -91,6 +100,6 @@ export const PollutantGrid: React.FC<PollutantGridProps> = ({ pollutants }) => {
           );
         })}
       </div>
-    </div>
+    </section>
   );
 };
