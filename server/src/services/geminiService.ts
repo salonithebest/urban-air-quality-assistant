@@ -93,6 +93,7 @@ CRITICAL GROUNDING INSTRUCTIONS:
    - Infants / Children: rapid cadence, lung alveoli development, peak exposure hours.
    - Seniors / Cardiac / Asthmatic: systemic vascular oxidative stress, airway hyper-reactivity, indoor buffer zones.
    - Healthy Adults: endurance limits, mucosal protection, post-commute recovery without alarming phrasing.
+   - MEDICAL SAFETY RULE: Do NOT provide medication timing, dosage, or prescriptive medication instructions (e.g. NEVER say "pre-medicate 15 minutes before" or specify intervals). Always advise the user to consult their physician (e.g. "Ask your doctor whether you should use your rescue inhaler before outdoor exposure"). Remind users to keep prescribed inhalers accessible, but never give dosing schedules.
 6. COMMUTE MODES:
    Active commute legs: ${routines.map((r) => `${r.activityType} (${r.durationMinutes} min, ${r.distanceKm ?? "auto"} km)`).join("; ") || "None configured"}.
    Detail exposure avoidance strategies for their specific modes.
@@ -213,7 +214,7 @@ export function generateDeterministicFallback(
       case "asthmatic":
         healthImpact = `Hyper-reactive airways react strongly to ${prominentDisplay} at AQI ${aqi}. Inhaled particulates irritate bronchial smooth muscle, triggering bronchospasms, nocturnal coughing, and sudden drops in peak expiratory flow.`;
         personalTips.push(
-          "Pre-medicate with prescribed preventive inhalers 20 minutes prior to any unavoidable outdoor transit.",
+          "Ask your doctor whether you should use your rescue inhaler before outdoor exposure; keep your prescribed rescue inhaler accessible at all times.",
           "Always wear a tight-seal N95 mask when stepping near roadside dust or construction corridors.",
           "Maintain peak flow meter logs twice daily; avoid sudden transitions between cold air and air-conditioned rooms."
         );

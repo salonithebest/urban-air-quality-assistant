@@ -71,8 +71,8 @@ export function generateClientFallbackAdvice(
           memberName: member.name,
           healthImpact: `Concentrated ${prominentDisplay} at AQI ${aqi} is a potent bronchoconstrictor in ${city}, heightening airway hyper-reactivity, wheezing, and daytime coughing.`,
           personalTips: [
-            `Carry a rapid-acting rescue inhaler (such as Salbutamol) on your person at all times during any necessary transit.`,
-            `Pre-medicate 15 minutes before any unavoidable outdoor exposure as advised by your pulmonologist.`,
+            `Carry your prescribed rescue inhaler on your person at all times during any necessary transit.`,
+            `Ask your doctor whether you should use your rescue inhaler before outdoor exposure.`,
             `Rinse nasal cavities with isotonic sterile saline spray upon returning home to eliminate deposited particulate mass.`,
           ],
         };
