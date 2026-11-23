@@ -2,6 +2,20 @@
   "name": "urban-air-quality-assistant",
   "version": "1.0.0",
   "description": "Family-focused air-quality planner for Indian cities — PromptWars Challenge 06",
+  "license": "MIT",
+  "author": "Urban Air Quality Assistant Team",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/salonithebest/urban-air-quality-assistant.git"
+  },
+  "keywords": [
+    "cpcb-aqi",
+    "air-quality",
+    "gemini-api",
+    "google-promptwars",
+    "carbon-reduction",
+    "typescript"
+  ],
   "private": true,
   "workspaces": [
     "client",
