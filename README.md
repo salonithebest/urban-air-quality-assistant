@@ -1,4 +1,4 @@
-# Urban Air Quality Assistant (AirWise India)
+# Urban Air Quality Assistant
 
 > **Google PromptWars Challenge 06: Urban Air Quality Assistant**  
 > A family-focused air-quality planner for Indian cities. It shows live estimated AQI using official CPCB formulas, explains personalized health impacts for each family member, provides actionable low-emission routines and indoor air tips, and computes deterministic CO₂ savings against solo car driving.

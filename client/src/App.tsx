@@ -49,6 +49,13 @@ export const App: React.FC = () => {
     getAdvice(aqiData, members, routineChoices);
   };
 
+  // Auto-generate initial advice when aqiData first loads so advice appears immediately on screen
+  React.useEffect(() => {
+    if (aqiData && !advice && !adviceLoading && members.length > 0) {
+      getAdvice(aqiData, members, routineChoices);
+    }
+  }, [aqiData, advice, adviceLoading, members, routineChoices, getAdvice]);
+
   return (
     <div className="min-h-screen py-6 sm:py-10 px-3 sm:px-6 flex flex-col items-center justify-between">
       {/* Floating Ambient Organic Blobs for Dreamy SaaS Background */}
@@ -67,7 +74,7 @@ export const App: React.FC = () => {
                 <span className="w-8 h-8 rounded-xl bg-gradient-to-tr from-teal-500 to-cyan-500 flex items-center justify-center text-white shadow-md shadow-teal-500/20">
                   <Wind className="w-4 h-4" />
                 </span>
-                AirWise
+                Urban Air Quality Assistant
               </span>
 
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-teal-50 border border-teal-200 text-teal-800 text-[11px] font-black uppercase tracking-wider">
@@ -82,16 +89,11 @@ export const App: React.FC = () => {
 
             {/* Hero Title & Value Proposition */}
             <h1 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight leading-tight">
-              Hi, I’m AirWise—
-              <br className="hidden sm:inline" />
-              The Super{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-600 via-cyan-600 to-indigo-600">
-                Air Quality Assistant
-              </span>
+              Urban Air Quality Assistant
             </h1>
 
             <p className="text-sm sm:text-base text-slate-600 mt-2 max-w-2xl leading-relaxed font-medium">
-              Protect your family from winter smog with verified CPCB breakpoint calculations, personalized vulnerability protocols, and carbon-cutting commute routines.
+              Protect your family from winter smog with CPCB breakpoint calculations, personalized vulnerability protocols, and carbon-cutting commute routines.
             </p>
           </div>
 

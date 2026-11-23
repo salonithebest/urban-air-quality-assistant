@@ -31,7 +31,7 @@ export const AqiCardFooter: React.FC<AqiCardFooterProps> = ({ dataNote }) => {
           className="bg-white border border-slate-200/90 hover:border-teal-300 px-3.5 py-1.5 rounded-xl text-slate-700 hover:text-teal-800 inline-flex items-center gap-1.5 transition-colors shadow-2xs font-semibold"
         >
           <ShieldCheck className="w-3.5 h-3.5 text-teal-600" />
-          <span>Official CPCB Sameer Portal</span>
+          <span>CPCB reference</span>
         </a>
       </div>
     </footer>
