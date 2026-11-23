@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import type { AqiResponse } from "../types/index.js";
 import type { City } from "../config/cities.js";
+import { fetchClientAqi } from "../utils/clientOpenMeteo.js";
 
 export function useAirQuality(city: City) {
   const [data, setData] = useState<AqiResponse | null>(null);
@@ -18,14 +19,23 @@ export function useAirQuality(city: City) {
       const res = await fetch(url);
 
       if (!res.ok) {
-        const errJson = await res.json().catch(() => ({}));
-        throw new Error(errJson.message || `Failed to fetch AQI (HTTP ${res.status})`);
+        // Fallback directly to client-side Open-Meteo & CPCB calculation
+        console.warn(`Server /api/air-quality returned ${res.status}. Using direct Open-Meteo client fallback.`);
+        const directData = await fetchClientAqi(city.lat, city.lon, city.name);
+        setData(directData);
+        return;
       }
 
       const json = (await res.json()) as AqiResponse;
       setData(json);
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Failed to load air quality data");
+      console.warn("API fetch error, falling back to client-side Open-Meteo engine:", err);
+      try {
+        const directData = await fetchClientAqi(city.lat, city.lon, city.name);
+        setData(directData);
+      } catch (fallbackErr: unknown) {
+        setError(fallbackErr instanceof Error ? fallbackErr.message : "Failed to load air quality data");
+      }
     } finally {
       setLoading(false);
     }

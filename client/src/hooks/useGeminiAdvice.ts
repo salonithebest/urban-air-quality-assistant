@@ -7,6 +7,7 @@ import type {
   AdviceResponse,
   AdviceInputSnapshot,
 } from "../types/index.js";
+import { generateClientFallbackAdvice } from "../utils/clientFallbackAdvice.js";
 
 export function useGeminiAdvice() {
   const [advice, setAdvice] = useState<AdviceResponse | null>(null);
@@ -24,16 +25,18 @@ export function useGeminiAdvice() {
       setLoading(true);
       setError(null);
 
+      const effectiveIndoorContext = indoorContext ?? {
+        hasAirPurifier: true,
+        hasPlants: true,
+        ventilationType: "natural",
+      };
+
       try {
         const payload = {
           aqiSnapshot,
           familyProfile: { members: familyMembers },
           routineChoices,
-          indoorContext: indoorContext ?? {
-            hasAirPurifier: true,
-            hasPlants: true,
-            ventilationType: "natural",
-          },
+          indoorContext: effectiveIndoorContext,
         };
 
         const res = await fetch("/api/advice", {
@@ -43,15 +46,18 @@ export function useGeminiAdvice() {
         });
 
         if (!res.ok) {
-          const errJson = await res.json().catch(() => ({}));
-          const detailsMsg = errJson.details
-            ? errJson.details.map((d: { field: string; message: string }) => `${d.field}: ${d.message}`).join("; ")
-            : null;
-          throw new Error(detailsMsg || errJson.error || errJson.message || `Failed with status ${res.status}`);
+          console.warn(`Server /api/advice returned ${res.status}. Using direct client fallback engine.`);
+          const fallbackData = generateClientFallbackAdvice(
+            aqiSnapshot,
+            familyMembers,
+            routineChoices,
+            effectiveIndoorContext
+          );
+          setAdvice(fallbackData);
+        } else {
+          const data = (await res.json()) as AdviceResponse;
+          setAdvice(data);
         }
-
-        const data = (await res.json()) as AdviceResponse;
-        setAdvice(data);
 
         // Save immutable snapshot of exact inputs used to generate this plan
         setLastGeneratedSnapshot({
@@ -67,7 +73,26 @@ export function useGeminiAdvice() {
           generatedAt: new Date().toISOString(),
         });
       } catch (err: unknown) {
-        setError(err instanceof Error ? err.message : "Failed to generate personalized advice");
+        console.warn("Advice request failed, executing client fallback:", err);
+        const fallbackData = generateClientFallbackAdvice(
+          aqiSnapshot,
+          familyMembers,
+          routineChoices,
+          effectiveIndoorContext
+        );
+        setAdvice(fallbackData);
+        setLastGeneratedSnapshot({
+          city: aqiSnapshot.city,
+          lat: aqiSnapshot.lat,
+          lon: aqiSnapshot.lon,
+          aqi: aqiSnapshot.aqi,
+          category: aqiSnapshot.category,
+          prominentPollutant: aqiSnapshot.prominentPollutant,
+          pollutants: [...aqiSnapshot.pollutants],
+          members: familyMembers.map((m) => ({ ...m })),
+          routineChoices: routineChoices.map((r) => ({ ...r })),
+          generatedAt: new Date().toISOString(),
+        });
       } finally {
         setLoading(false);
       }
@@ -75,11 +100,5 @@ export function useGeminiAdvice() {
     []
   );
 
-  const clearAdvice = useCallback(() => {
-    setAdvice(null);
-    setLastGeneratedSnapshot(null);
-    setError(null);
-  }, []);
-
-  return { advice, lastGeneratedSnapshot, loading, error, getAdvice, clearAdvice };
+  return { advice, lastGeneratedSnapshot, loading, error, getAdvice };
 }
