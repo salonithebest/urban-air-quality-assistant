@@ -7,7 +7,7 @@ interface AqiCardFooterProps {
 
 export const AqiCardFooter: React.FC<AqiCardFooterProps> = ({ dataNote }) => {
   return (
-    <footer className="mt-12 border-t border-slate-200/80 pt-6 pb-6 text-xs text-slate-500 flex flex-col md:flex-row items-center justify-between gap-4 font-medium">
+    <footer role="contentinfo" className="mt-12 border-t border-slate-200/80 pt-6 pb-6 text-xs text-slate-500 flex flex-col md:flex-row items-center justify-between gap-4 font-medium">
       <div className="flex items-center gap-2 text-center md:text-left">
         <Info className="w-4 h-4 text-teal-600 shrink-0" />
         <span className="leading-relaxed text-slate-600">{dataNote}</span>

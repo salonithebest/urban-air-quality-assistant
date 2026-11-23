@@ -56,7 +56,15 @@ export const AqiGauge: React.FC<AqiGaugeProps> = ({ data }) => {
         </div>
 
         {/* CPCB Score Display */}
-        <div className="glass-card rounded-2xl p-5 sm:px-8 sm:py-6 flex flex-col items-center justify-center min-w-[190px] shrink-0 border border-teal-200 shadow-xs">
+        <div
+          role="meter"
+          aria-label={`Current CPCB Air Quality Index for ${data.city}`}
+          aria-valuenow={data.aqi}
+          aria-valuemin={0}
+          aria-valuemax={500}
+          aria-valuetext={`${data.aqi} out of 500, category ${data.category}`}
+          className="glass-card rounded-2xl p-5 sm:px-8 sm:py-6 flex flex-col items-center justify-center min-w-[190px] shrink-0 border border-teal-200 shadow-xs"
+        >
           <span className="text-[11px] font-extrabold uppercase tracking-widest text-slate-400 flex items-center gap-1.5 mb-1">
             <Gauge className="w-3.5 h-3.5 text-teal-600" /> CPCB AQI
           </span>

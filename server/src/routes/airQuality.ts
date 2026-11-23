@@ -23,7 +23,7 @@ airQualityRouter.get(
   "/air-quality",
   aqiRateLimiter,
   validateQuery(AirQualityQuerySchema),
-  async (req, res, next) => {
+  async (req, res, next): Promise<void> => {
     try {
       const { lat, lon, city } = req.query as unknown as {
         lat: number;
@@ -36,10 +36,11 @@ airQualityRouter.get(
       const cached = cache.get(cacheKey);
 
       if (cached && cached.expiresAt > now) {
-        return res.json({
+        res.json({
           ...cached.data,
           city: city || cached.data.city,
         });
+        return;
       }
 
       // Fetch fresh conditions from Open-Meteo
@@ -66,9 +67,11 @@ airQualityRouter.get(
         expiresAt: now + CACHE_TTL_MS,
       });
 
-      return res.json(response);
+      res.json(response);
+      return;
     } catch (err) {
       next(err);
+      return;
     }
   }
 );

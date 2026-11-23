@@ -58,15 +58,23 @@ export const App: React.FC = () => {
 
   return (
     <div className="min-h-screen py-6 sm:py-10 px-3 sm:px-6 flex flex-col items-center justify-between">
+      {/* WCAG 2.1 AAA Accessibility Skip Link */}
+      <a
+        href="#main-content"
+        className="sr-only sr-only-focusable z-50 bg-teal-800 text-white font-bold px-4 py-2 rounded-xl shadow-lg border border-teal-600 fixed top-3 left-3"
+      >
+        Skip to main content
+      </a>
+
       {/* Floating Ambient Organic Blobs for Dreamy SaaS Background */}
-      <div className="fixed top-12 left-10 w-96 h-96 bg-teal-300/30 rounded-full blur-3xl pointer-events-none -z-10" />
-      <div className="fixed bottom-16 right-10 w-[28rem] h-[28rem] bg-indigo-300/30 rounded-full blur-3xl pointer-events-none -z-10" />
-      <div className="fixed top-1/2 left-1/3 w-80 h-80 bg-rose-200/30 rounded-full blur-3xl pointer-events-none -z-10" />
+      <div className="fixed top-12 left-10 w-96 h-96 bg-teal-300/30 rounded-full blur-3xl pointer-events-none -z-10" aria-hidden="true" />
+      <div className="fixed bottom-16 right-10 w-[28rem] h-[28rem] bg-indigo-300/30 rounded-full blur-3xl pointer-events-none -z-10" aria-hidden="true" />
+      <div className="fixed top-1/2 left-1/3 w-80 h-80 bg-rose-200/30 rounded-full blur-3xl pointer-events-none -z-10" aria-hidden="true" />
 
       {/* Main Glass Canvas Container */}
       <div className="frosted-canvas max-w-6xl w-full rounded-[2.5rem] p-6 sm:p-10 shadow-2xl relative">
-        {/* Luxury SaaS Header (Cherish / DayDay Reference Style) */}
-        <header className="mb-10 flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-slate-200/80 pb-8">
+        {/* Luxury SaaS Header */}
+        <header role="banner" className="mb-10 flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-slate-200/80 pb-8">
           <div>
             {/* Top Brand & Status Badges */}
             <div className="flex flex-wrap items-center gap-2.5 mb-3">
@@ -109,6 +117,9 @@ export const App: React.FC = () => {
             </button>
           </div>
         </header>
+
+        {/* Main Content Landmark */}
+        <main id="main-content" role="main" tabIndex={-1} className="outline-none">
 
         {/* City / Locality Selector */}
         <CitySelector
@@ -294,6 +305,7 @@ export const App: React.FC = () => {
             />
           </div>
         )}
+        </main>
 
         {/* Methodology & Data Source Disclaimers */}
         {aqiData && <AqiCardFooter dataNote={aqiData.dataNote} />}

@@ -209,20 +209,31 @@ export const FamilyProfileForm: React.FC<FamilyProfileFormProps> = ({
         <form
           onSubmit={handleSubmit}
           className="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5"
+          aria-label="Add new household member form"
         >
+          <label htmlFor="member-name-input" className="sr-only">
+            Family member name
+          </label>
           <input
+            id="member-name-input"
             type="text"
             placeholder="Name (e.g. Aarav, Dadi)..."
             value={name}
             onChange={(e) => setName(e.target.value)}
             className="flex-1 px-3.5 py-2.5 text-xs glass-input rounded-xl focus:outline-none font-medium"
             maxLength={30}
+            aria-label="Family member name"
           />
 
+          <label htmlFor="member-role-select" className="sr-only">
+            Vulnerability profile role
+          </label>
           <select
+            id="member-role-select"
             value={role}
             onChange={(e) => setRole(e.target.value as FamilyRole)}
             className="px-3 py-2.5 text-xs glass-input rounded-xl font-bold text-slate-800 cursor-pointer"
+            aria-label="Select biological vulnerability role"
           >
             {ROLES.map((r) => (
               <option key={r.value} value={r.value} className="bg-white text-slate-900">
@@ -234,9 +245,10 @@ export const FamilyProfileForm: React.FC<FamilyProfileFormProps> = ({
           <button
             type="submit"
             disabled={!name.trim()}
+            aria-label="Add member to household"
             className="px-4 py-2.5 bg-teal-600 hover:bg-teal-700 disabled:opacity-40 text-white font-black text-xs rounded-xl flex items-center justify-center gap-1.5 transition-all active:scale-95 shadow-md shadow-teal-600/20 cursor-pointer"
           >
-            <Plus className="w-3.5 h-3.5" />
+            <Plus className="w-3.5 h-3.5" aria-hidden="true" />
             <span>Add</span>
           </button>
         </form>

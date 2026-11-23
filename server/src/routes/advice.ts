@@ -11,7 +11,7 @@ adviceRouter.post(
   "/advice",
   adviceRateLimiter,
   validateBody(AdviceRequestSchema),
-  async (req, res, next) => {
+  async (req, res, next): Promise<void> => {
     try {
       const adviceRequest = req.body as AdviceRequest;
 
@@ -21,9 +21,11 @@ adviceRouter.post(
       // 2. Call Gemini for language phrasing (passing the pre-computed CO2 & AQI)
       const advice = await generateAdviceWording(adviceRequest, co2Estimate);
 
-      return res.json(advice);
+      res.json(advice);
+      return;
     } catch (err) {
       next(err);
+      return;
     }
   }
 );

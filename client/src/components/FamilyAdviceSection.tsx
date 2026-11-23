@@ -50,7 +50,7 @@ export const FamilyAdviceSection: React.FC<FamilyAdviceSectionProps> = ({
   };
 
   return (
-    <div className="mb-8">
+    <div className="mb-8" role="region" aria-label="Personalized Family Member Health Protocols">
       {/* Section Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
         <div className="flex items-center gap-2.5">
@@ -74,9 +74,10 @@ export const FamilyAdviceSection: React.FC<FamilyAdviceSectionProps> = ({
           <button
             onClick={toggleAllCards}
             type="button"
+            aria-label={allFlipped ? "Flip all cards to summary view" : "Flip all cards to full protocol details"}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black text-teal-800 bg-teal-50 hover:bg-teal-100 border border-teal-300 transition-all shadow-2xs active:scale-95 cursor-pointer"
           >
-            <Layers className="w-3.5 h-3.5 text-teal-700" />
+            <Layers className="w-3.5 h-3.5 text-teal-700" aria-hidden="true" />
             <span>{allFlipped ? "Flip All to Summary" : "Flip All to Full Details"}</span>
           </button>
 
@@ -99,6 +100,8 @@ export const FamilyAdviceSection: React.FC<FamilyAdviceSectionProps> = ({
               title="Click to flip card"
               role="button"
               tabIndex={0}
+              aria-expanded={isFlipped}
+              aria-label={`Interactive protocol card for ${advice.memberName}. Currently showing ${isFlipped ? "full details" : "summary preview"}. Click or press Enter to flip.`}
               onKeyDown={(e) => {
                 if (e.key === "Enter" || e.key === " ") {
                   e.preventDefault();

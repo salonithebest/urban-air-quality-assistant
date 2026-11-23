@@ -8,7 +8,27 @@ import { errorHandler } from "./middleware/errorHandler.js";
 
 export const app = express();
 
-app.use(helmet());
+// Security: Disable fingerprinting & configure defensive headers
+app.disable("x-powered-by");
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "'unsafe-inline'"],
+        styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+        fontSrc: ["'self'", "https://fonts.gstatic.com"],
+        connectSrc: [
+          "'self'",
+          "https://air-quality-api.open-meteo.com",
+          "https://generativelanguage.googleapis.com",
+        ],
+        imgSrc: ["'self'", "data:", "https:"],
+      },
+    },
+    crossOriginEmbedderPolicy: false,
+  })
+);
 app.use(
   cors({
     origin: true,

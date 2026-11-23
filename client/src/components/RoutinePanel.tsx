@@ -89,6 +89,7 @@ export const RoutinePanel: React.FC<RoutinePanelProps> = ({
                     </div>
                     <select
                       value={c.activityType}
+                      aria-label={`Commute mode for leg ${idx + 1}`}
                       onChange={(e) => {
                         const newMode = e.target.value as ActivityType;
                         updateChoice(idx, {
@@ -112,6 +113,7 @@ export const RoutinePanel: React.FC<RoutinePanelProps> = ({
                         type="number"
                         min={1}
                         max={480}
+                        aria-label={`Commute duration in minutes for leg ${idx + 1}`}
                         value={c.durationMinutes}
                         onChange={(e) =>
                           updateChoice(idx, {
@@ -125,7 +127,7 @@ export const RoutinePanel: React.FC<RoutinePanelProps> = ({
 
                     {isWfh ? (
                       <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-500 select-none">
-                        <Home className="w-3.5 h-3.5 text-teal-600" />
+                        <Home className="w-3.5 h-3.5 text-teal-600" aria-hidden="true" />
                         <span className="text-teal-700 font-mono">0 km</span>
                         <span className="text-[10px] text-slate-400 font-medium">(Home)</span>
                       </div>
@@ -136,6 +138,7 @@ export const RoutinePanel: React.FC<RoutinePanelProps> = ({
                           min={0.1}
                           max={200}
                           step={0.5}
+                          aria-label={`Commute distance in kilometers for leg ${idx + 1}`}
                           value={c.distanceKm ?? 1}
                           onChange={(e) =>
                             updateChoice(idx, {
@@ -151,6 +154,7 @@ export const RoutinePanel: React.FC<RoutinePanelProps> = ({
                     <button
                       type="button"
                       onClick={() => removeChoice(idx)}
+                      aria-label={`Remove commute leg ${idx + 1}`}
                       className="p-1.5 text-slate-400 hover:text-rose-600 transition-colors rounded-lg ml-1 cursor-pointer"
                       title="Remove leg"
                     >
