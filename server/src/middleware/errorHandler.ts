@@ -5,7 +5,7 @@
  */
 
 import type { Request, Response, NextFunction } from "express";
-import { InsufficientDataError } from "../services/aqiEngine.js";
+import { InsufficientDataError } from "../errors.js";
 
 export function errorHandler(
   err: Error,

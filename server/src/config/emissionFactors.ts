@@ -28,7 +28,7 @@ export interface EmissionFactor {
   notes: string;
 }
 
-export const EMISSION_FACTORS: Record<string, EmissionFactor> = {
+export const EMISSION_FACTORS = {
   car: {
     kgPerKm: 0.14,
     label: "Car (petrol)",
@@ -75,7 +75,9 @@ export const EMISSION_FACTORS: Record<string, EmissionFactor> = {
     year: 2024,
     notes: "Zero commute emissions.",
   },
-} as const;
+} as const satisfies Record<string, EmissionFactor>;
+
+export type TransportMode = keyof typeof EMISSION_FACTORS;
 
 /** Average CO₂ absorbed by one tree per year (kg). USDA Forest Service. */
 export const KG_CO2_PER_TREE_PER_YEAR = 21;

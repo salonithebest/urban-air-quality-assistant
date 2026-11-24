@@ -7,6 +7,19 @@
 import type { Request, Response, NextFunction } from "express";
 import type { ZodSchema } from "zod";
 
+/**
+ * Type declaration augmenting Express.Locals to strictly define validated payloads and user identity.
+ */
+declare global {
+  namespace Express {
+    interface Locals {
+      validatedQuery?: unknown;
+      validatedBody?: unknown;
+      user?: { id: string; role: string };
+    }
+  }
+}
+
 export function validateQuery<T>(schema: ZodSchema<T>) {
   return (req: Request, res: Response, next: NextFunction): void => {
     const result = schema.safeParse(req.query);

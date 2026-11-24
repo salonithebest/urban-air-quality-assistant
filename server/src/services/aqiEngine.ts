@@ -160,12 +160,8 @@ export interface AqiResult {
   readings: PollutantReading[];
 }
 
-export class InsufficientDataError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = "InsufficientDataError";
-  }
-}
+import { InsufficientDataError } from "../errors.js";
+export { InsufficientDataError };
 
 /**
  * Compute the overall CPCB AQI from an array of raw pollutant concentrations.

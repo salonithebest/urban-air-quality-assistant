@@ -9,7 +9,8 @@ import { aqiRateLimiter } from "../middleware/rateLimiter.js";
 import { fetchPollutantData } from "../services/openMeteo.js";
 import { computeAqi } from "../services/aqiEngine.js";
 
-export const airQualityRouter = Router();
+const router = Router();
+export const airQualityRouter = router;
 
 // In-memory cache: key = `${lat},${lon}`, 15-minute TTL
 interface CachedEntry {
@@ -19,7 +20,7 @@ interface CachedEntry {
 const cache = new Map<string, CachedEntry>();
 const CACHE_TTL_MS = 15 * 60 * 1000;
 
-airQualityRouter.get(
+router.get(
   "/air-quality",
   aqiRateLimiter,
   validateQuery(AirQualityQuerySchema),

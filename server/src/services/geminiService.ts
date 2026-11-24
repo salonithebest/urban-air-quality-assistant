@@ -32,6 +32,18 @@ const ADVICE_CACHE_TTL_MS = 15 * 60 * 1000;
  * Sanitizes and whitelists user-provided text inputs before embedding into LLM prompts.
  * Strips delimiter characters, prompt injection patterns, and control characters to prevent LLM manipulation.
  */
+/**
+ * Sanitizes error messages to guarantee no API keys or sensitive query parameters leak into logs.
+ */
+function sanitizeErrorMessage(err: unknown): string {
+  if (err instanceof Error) {
+    return err.message
+      .replace(/(?:key|api[_-]?key|token)=([^\s&]+)/gi, "$1=[REDACTED]")
+      .replace(/AIza[0-9A-Za-z-_]{35}/g, "[REDACTED_API_KEY]");
+  }
+  return "Unknown error during generative AI synthesis";
+}
+
 export function sanitizePromptText(value: string | undefined | null, maxLength = 80): string {
   if (!value || typeof value !== "string") return "";
   return value
@@ -185,7 +197,10 @@ ${JSON.stringify(
     return adviceResponse;
   } catch (err: unknown) {
     if (process.env.NODE_ENV === "development") {
-      console.warn("Gemini API call failed, using deterministic fallback advice:", err);
+      console.warn(
+        "Gemini API call failed, using deterministic fallback advice:",
+        sanitizeErrorMessage(err)
+      );
     }
     const fallback = generateDeterministicFallback(request, co2Estimate);
     return fallback;

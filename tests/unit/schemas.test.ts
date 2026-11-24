@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import {
   AirQualityQuerySchema,
   FamilyMemberSchema,
@@ -7,6 +7,7 @@ import {
   AdviceRequestSchema,
   DATA_NOTE,
 } from "../../server/src/schemas/index.js";
+import { validateQuery, validateBody } from "../../server/src/middleware/validate.js";
 
 describe("AirQualityQuerySchema", () => {
   it("accepts valid Indian coordinates", () => {
@@ -155,5 +156,59 @@ describe("AdviceRequestSchema", () => {
 
     const res = AdviceRequestSchema.safeParse(mockRequest);
     expect(res.success).toBe(true);
+  });
+});
+
+describe("validate middleware & res.locals shape assertion", () => {
+  it("populates and types res.locals.validatedQuery upon successful validation", () => {
+    const req = { query: { lat: "28.6139", lon: "77.2090", city: "Delhi" } } as any;
+    const res = { locals: {} } as any;
+    const next = vi.fn();
+
+    validateQuery(AirQualityQuerySchema)(req, res, next);
+
+    expect(next).toHaveBeenCalledTimes(1);
+    expect(res.locals.validatedQuery).toBeDefined();
+    expect(res.locals.validatedQuery).toMatchObject({
+      lat: 28.6139,
+      lon: 77.209,
+      city: "Delhi",
+    });
+  });
+
+  it("populates and types res.locals.validatedBody upon successful validation", () => {
+    const validBody = {
+      aqiSnapshot: {
+        city: "Mumbai",
+        lat: 19.076,
+        lon: 72.8777,
+        aqi: 120,
+        category: "Moderately Polluted",
+        prominentPollutant: "pm10",
+        pollutants: [
+          { pollutant: "pm2_5", concentration: 40, unit: "µg/m³", subIndex: 67, category: "Satisfactory" },
+          { pollutant: "pm10", concentration: 110, unit: "µg/m³", subIndex: 120, category: "Moderately Polluted" },
+          { pollutant: "no2", concentration: 30, unit: "µg/m³", subIndex: 38, category: "Good" },
+        ],
+        timestamp: new Date().toISOString(),
+        dataNote: DATA_NOTE,
+      },
+      familyProfile: {
+        members: [{ id: "123e4567-e89b-12d3-a456-426614174000", name: "Aarav", role: "child" }],
+      },
+      routineChoices: [{ activityType: "metro", durationMinutes: 30, distanceKm: 12 }],
+      indoorContext: { hasAirPurifier: true, hasPlants: true, ventilationType: "natural" },
+    };
+
+    const req = { body: validBody } as any;
+    const res = { locals: {} } as any;
+    const next = vi.fn();
+
+    validateBody(AdviceRequestSchema)(req, res, next);
+
+    expect(next).toHaveBeenCalledTimes(1);
+    expect(res.locals.validatedBody).toBeDefined();
+    expect(res.locals.validatedBody.aqiSnapshot.city).toBe("Mumbai");
+    expect(res.locals.validatedBody.familyProfile.members).toHaveLength(1);
   });
 });

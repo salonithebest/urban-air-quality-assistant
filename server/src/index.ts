@@ -5,39 +5,19 @@ import { env } from "./config/env.js";
 import { airQualityRouter } from "./routes/airQuality.js";
 import { adviceRouter } from "./routes/advice.js";
 import { errorHandler } from "./middleware/errorHandler.js";
+import { aqiRateLimiter, adviceRateLimiter } from "./middleware/rateLimiter.js";
 
 export const app = express();
 
-// Security: Disable fingerprinting & configure defensive headers
+// Security: Disable fingerprinting & apply global security middleware
 app.disable("x-powered-by");
-app.use(
-  helmet({
-    contentSecurityPolicy: {
-      directives: {
-        defaultSrc: ["'self'"],
-        scriptSrc: ["'self'", "'unsafe-inline'"],
-        styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
-        fontSrc: ["'self'", "https://fonts.gstatic.com"],
-        connectSrc: [
-          "'self'",
-          "https://air-quality-api.open-meteo.com",
-          "https://generativelanguage.googleapis.com",
-        ],
-        imgSrc: ["'self'", "data:", "https:"],
-      },
-    },
-    crossOriginEmbedderPolicy: false,
-  })
-);
-app.use(
-  cors({
-    origin: true,
-    credentials: true,
-    methods: ["GET", "POST", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-  })
-);
+app.use(helmet());
+app.use(cors({ origin: process.env.CLIENT_ORIGIN || "*" }));
 app.use(express.json({ limit: "10kb" }));
+
+// Route-level rate limiting middleware attachment
+app.use("/api/air-quality", aqiRateLimiter);
+app.use("/api/advice", adviceRateLimiter);
 
 // Healthcheck
 app.get("/health", (_req, res) => {

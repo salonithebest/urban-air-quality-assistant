@@ -15,7 +15,16 @@
  * This client divides the raw CO value by 1000 before returning it.
  */
 
+import { z } from "zod";
 import type { RawConcentration } from "./aqiEngine.js";
+
+const OPEN_METEO_BASE_URL = "https://air-quality-api.open-meteo.com/v1/air-quality" as const;
+
+/** Strict validation schema preventing SSRF via manipulated coordinate parameters */
+const CoordinateSchema = z.object({
+  lat: z.number().min(-90).max(90),
+  lon: z.number().min(-180).max(180),
+});
 
 export interface OpenMeteoAirQualityResponse {
   latitude: number;
@@ -39,9 +48,12 @@ export async function fetchPollutantData(
   rawConcentrations: RawConcentration[];
   timestamp: string;
 }> {
-  const url = new URL("https://air-quality-api.open-meteo.com/v1/air-quality");
-  url.searchParams.set("latitude", lat.toString());
-  url.searchParams.set("longitude", lon.toString());
+  // SSRF defense: strictly parse and validate coordinates against numerical bounds
+  const validated = CoordinateSchema.parse({ lat, lon });
+
+  const url = new URL(OPEN_METEO_BASE_URL);
+  url.searchParams.set("latitude", validated.lat.toFixed(4));
+  url.searchParams.set("longitude", validated.lon.toFixed(4));
   url.searchParams.set(
     "current",
     "pm2_5,pm10,nitrogen_dioxide,sulphur_dioxide,ozone,carbon_monoxide"

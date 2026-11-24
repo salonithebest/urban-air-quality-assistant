@@ -167,14 +167,27 @@ export class InsufficientDataError extends Error {
   }
 }
 
+// In-memory memoization cache for pure CPCB AQI computations
+// Eliminates redundant interpolations and prevents UI jank on lower-end mobile devices
+const aqiCalculationCache = new Map<string, AqiResult>();
+
 /**
  * Compute the overall CPCB AQI from an array of raw pollutant concentrations.
+ * Results are cached in-memory to prevent repeated heavy calculation across re-renders.
  *
  * Throws InsufficientDataError if the minimum data rule is not satisfied:
  *   - At least 3 pollutants must have non-null concentrations
  *   - At least one must be PM₂.₅ or PM₁₀
  */
 export function computeAqi(rawConcentrations: RawConcentration[]): AqiResult {
+  const cacheKey = rawConcentrations
+    .map((r) => `${r.pollutant}:${r.concentration ?? "null"}`)
+    .sort()
+    .join(";");
+
+  const cached = aqiCalculationCache.get(cacheKey);
+  if (cached) return cached;
+
   // Filter to valid (non-null, non-negative) concentrations
   const valid = rawConcentrations.filter(
     (r): r is { pollutant: PollutantId; concentration: number } =>
@@ -207,10 +220,14 @@ export function computeAqi(rawConcentrations: RawConcentration[]): AqiResult {
     r.subIndex > max.subIndex ? r : max
   );
 
-  return {
+  const result: AqiResult = {
     aqi: prominent.subIndex,
     category: prominent.category,
     prominentPollutant: prominent.pollutant,
     readings,
   };
+
+  if (aqiCalculationCache.size > 200) aqiCalculationCache.clear();
+  aqiCalculationCache.set(cacheKey, result);
+  return result;
 }
