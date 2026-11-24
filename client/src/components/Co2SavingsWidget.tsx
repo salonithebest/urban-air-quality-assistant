@@ -70,7 +70,7 @@ export const Co2SavingsWidget: React.FC<Co2SavingsWidgetProps> = ({
               Deterministic Climate Accounting
             </span>
             <span className="text-[10px] font-bold bg-teal-50 text-teal-800 border border-teal-200 px-2 py-0.5 rounded-full flex items-center gap-1">
-              <ShieldCheck className="w-3 h-3 text-teal-600" aria-hidden="true" /> Verified Baseline
+              <ShieldCheck className="w-3 h-3 text-teal-600" aria-hidden="true" /> Reference baseline
             </span>
           </div>
 
