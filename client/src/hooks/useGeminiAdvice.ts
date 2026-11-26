@@ -14,6 +14,7 @@ export function useGeminiAdvice() {
   const [lastGeneratedSnapshot, setLastGeneratedSnapshot] = useState<AdviceInputSnapshot | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [isFallback, setIsFallback] = useState<boolean>(false);
 
   const getAdvice = useCallback(
     async (
@@ -43,6 +44,7 @@ export function useGeminiAdvice() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
+          signal: AbortSignal.timeout(12000),
         });
 
         if (!res.ok) {
@@ -54,9 +56,11 @@ export function useGeminiAdvice() {
             effectiveIndoorContext
           );
           setAdvice(fallbackData);
+          setIsFallback(true);
         } else {
           const data = (await res.json()) as AdviceResponse;
           setAdvice(data);
+          setIsFallback(false);
         }
 
         // Save immutable snapshot of exact inputs used to generate this plan
@@ -81,6 +85,7 @@ export function useGeminiAdvice() {
           effectiveIndoorContext
         );
         setAdvice(fallbackData);
+        setIsFallback(true);
         setLastGeneratedSnapshot({
           city: aqiSnapshot.city,
           lat: aqiSnapshot.lat,
@@ -100,5 +105,5 @@ export function useGeminiAdvice() {
     []
   );
 
-  return { advice, lastGeneratedSnapshot, loading, error, getAdvice };
+  return { advice, lastGeneratedSnapshot, loading, error, isFallback, getAdvice };
 }

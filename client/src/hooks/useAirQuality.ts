@@ -16,7 +16,9 @@ export function useAirQuality(city: City) {
       const url = `/api/air-quality?lat=${city.lat}&lon=${city.lon}&city=${encodeURIComponent(
         city.name
       )}`;
-      const res = await fetch(url);
+      const res = await fetch(url, {
+        signal: AbortSignal.timeout(8000),
+      });
 
       if (!res.ok) {
         // Fallback directly to client-side Open-Meteo & CPCB calculation

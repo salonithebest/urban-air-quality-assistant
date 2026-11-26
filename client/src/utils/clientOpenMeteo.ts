@@ -31,7 +31,9 @@ export async function fetchClientAqi(
   );
   url.searchParams.set("timezone", "Asia/Kolkata");
 
-  const response = await fetch(url.toString());
+  const response = await fetch(url.toString(), {
+    signal: AbortSignal.timeout(8000),
+  });
   if (!response.ok) {
     throw new Error(`Open-Meteo returned status ${response.status}`);
   }

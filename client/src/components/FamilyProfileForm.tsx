@@ -6,6 +6,7 @@ interface FamilyProfileFormProps {
   members: FamilyMember[];
   onAddMember: (member: Omit<FamilyMember, "id">) => void;
   onRemoveMember: (id: string) => void;
+  onResetToDefaults?: () => void;
   activeAqi?: number;
   activeCategory?: string;
   activeProminentPollutant?: string;
@@ -47,6 +48,7 @@ export const FamilyProfileForm: React.FC<FamilyProfileFormProps> = ({
   members,
   onAddMember,
   onRemoveMember,
+  onResetToDefaults,
   activeAqi = 138,
   activeCategory = "Moderately Polluted",
   activeProminentPollutant = "PM₂.₅",
@@ -99,6 +101,16 @@ export const FamilyProfileForm: React.FC<FamilyProfileFormProps> = ({
             <span className="text-xs font-semibold bg-white border border-slate-200 text-slate-700 px-2.5 py-0.5 rounded-full shadow-2xs">
               {members.length} / 10 Members
             </span>
+            {onResetToDefaults && (
+              <button
+                type="button"
+                onClick={onResetToDefaults}
+                className="text-[11px] font-bold text-slate-500 hover:text-slate-800 underline cursor-pointer"
+                title="Reset family members to default Child, Adult, Senior"
+              >
+                Reset
+              </button>
+            )}
           </div>
         </div>
 

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import type { FamilyMember } from "../types/index.js";
 
-const STORAGE_KEY = "urban_aqi_family_profile";
+const STORAGE_KEY = "urban_aqi_family_profile_v2";
 
 const DEFAULT_MEMBERS: FamilyMember[] = [
   { id: "d3b07384-d113-4944-9c87-8275e6fb0a11", name: "Child", role: "child" },
@@ -32,17 +32,29 @@ function generateUUIDv4(): string {
 export function useFamilyProfile() {
   const [members, setMembers] = useState<FamilyMember[]>(() => {
     try {
+      // Purge legacy v1 storage if present
+      if (typeof localStorage !== "undefined") {
+        localStorage.removeItem("urban_aqi_family_profile");
+      }
+
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
         const parsed: FamilyMember[] = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
           const uuidRegex =
             /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-          // Keep all valid saved members, and regenerate UUIDs only for members with invalid IDs
-          return parsed.map((m) => ({
-            ...m,
-            id: uuidRegex.test(m.id) ? m.id : generateUUIDv4(),
-          }));
+          // Auto-migrate legacy personal names if loaded from prior sessions
+          return parsed.map((m) => {
+            let cleanName = m.name;
+            if (cleanName === "Aarav") cleanName = "Child";
+            if (cleanName === "Saloni") cleanName = "Adult";
+            if (cleanName === "Dada ji") cleanName = "Senior";
+            return {
+              ...m,
+              name: cleanName,
+              id: uuidRegex.test(m.id) ? m.id : generateUUIDv4(),
+            };
+          });
         }
       }
     } catch {
@@ -73,5 +85,14 @@ export function useFamilyProfile() {
     setMembers((prev) => prev.filter((m) => m.id !== id));
   };
 
-  return { members, addMember, removeMember };
+  const resetToDefaults = () => {
+    setMembers(DEFAULT_MEMBERS);
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_MEMBERS));
+    } catch {
+      // ignore
+    }
+  };
+
+  return { members, addMember, removeMember, resetToDefaults };
 }

@@ -30,8 +30,8 @@ export const App: React.FC = () => {
 
   // Data hooks
   const { data: aqiData, loading: aqiLoading, error: aqiError, refetch } = useAirQuality(selectedCity);
-  const { members, addMember, removeMember } = useFamilyProfile();
-  const { advice, lastGeneratedSnapshot, loading: adviceLoading, error: adviceError, getAdvice } = useGeminiAdvice();
+  const { members, addMember, removeMember, resetToDefaults } = useFamilyProfile();
+  const { advice, lastGeneratedSnapshot, loading: adviceLoading, error: adviceError, isFallback, getAdvice } = useGeminiAdvice();
 
   // Detect whether the currently rendered advice is stale / out of sync with current session inputs
   const isPlanOutOfSync = Boolean(
@@ -174,6 +174,7 @@ export const App: React.FC = () => {
             members={members}
             onAddMember={addMember}
             onRemoveMember={removeMember}
+            onResetToDefaults={resetToDefaults}
             activeAqi={aqiData?.aqi}
             activeCategory={aqiData?.category}
             activeProminentPollutant={aqiData?.prominentPollutant}
@@ -285,14 +286,28 @@ export const App: React.FC = () => {
                 </h2>
               </div>
 
-              {lastGeneratedSnapshot && (
-                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-slate-200 text-slate-700 text-xs font-semibold shadow-xs">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-teal-600" />
-                  <span>
-                    Synchronized with <strong>{lastGeneratedSnapshot.city}</strong> (AQI {lastGeneratedSnapshot.aqi}) • {lastGeneratedSnapshot.members.length} Profiles
+              <div className="flex flex-wrap items-center gap-2">
+                {isFallback ? (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-800 text-[11px] font-black uppercase tracking-wider">
+                    <Shield className="w-3.5 h-3.5 text-amber-600" />
+                    Offline Rule-Engine Fallback
                   </span>
-                </div>
-              )}
+                ) : (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-teal-50 border border-teal-200 text-teal-800 text-[11px] font-black uppercase tracking-wider">
+                    <Sparkles className="w-3.5 h-3.5 text-teal-600" />
+                    Synthesized via Gemini 2.0 Flash
+                  </span>
+                )}
+
+                {lastGeneratedSnapshot && (
+                  <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-slate-200 text-slate-700 text-xs font-semibold shadow-xs">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-teal-600" />
+                    <span>
+                      Synchronized with <strong>{lastGeneratedSnapshot.city}</strong> (AQI {lastGeneratedSnapshot.aqi}) • {lastGeneratedSnapshot.members.length} Profiles
+                    </span>
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Individual Family Member Protocols */}
