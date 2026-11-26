@@ -217,7 +217,7 @@ export const FamilyProfileForm: React.FC<FamilyProfileFormProps> = ({
           <input
             id="member-name-input"
             type="text"
-            placeholder="Name (e.g. Aarav, Dadi)..."
+            placeholder="Name (e.g. Child, Senior)..."
             value={name}
             onChange={(e) => setName(e.target.value)}
             className="flex-1 px-3.5 py-2.5 text-xs glass-input rounded-xl focus:outline-none font-medium"

@@ -4,9 +4,9 @@ import type { FamilyMember } from "../types/index.js";
 const STORAGE_KEY = "urban_aqi_family_profile";
 
 const DEFAULT_MEMBERS: FamilyMember[] = [
-  { id: "d3b07384-d113-4944-9c87-8275e6fb0a11", name: "Aarav", role: "child" },
-  { id: "e4c18495-e224-4a55-ad98-9386f70c1b22", name: "Saloni", role: "adult" },
-  { id: "f5d295a6-f335-4b66-be09-a497081d2c33", name: "Dada ji", role: "senior" },
+  { id: "d3b07384-d113-4944-9c87-8275e6fb0a11", name: "Child", role: "child" },
+  { id: "e4c18495-e224-4a55-ad98-9386f70c1b22", name: "Adult", role: "adult" },
+  { id: "f5d295a6-f335-4b66-be09-a497081d2c33", name: "Senior", role: "senior" },
 ];
 
 function generateUUIDv4(): string {
