@@ -232,6 +232,16 @@ describe("computeAqi – minimum data rule", () => {
     ).toThrow(InsufficientDataError);
   });
 
+  it("throws InsufficientDataError when 3 entries contain duplicate pollutants (fewer than 3 unique)", () => {
+    expect(() =>
+      computeAqi([
+        { pollutant: "pm2_5", concentration: 45 },
+        { pollutant: "pm2_5", concentration: 50 },
+        { pollutant: "no2", concentration: 40 },
+      ])
+    ).toThrow(InsufficientDataError);
+  });
+
   it("succeeds with exactly 3 valid pollutants including one PM", () => {
     expect(() =>
       computeAqi([

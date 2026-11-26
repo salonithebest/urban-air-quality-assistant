@@ -34,7 +34,7 @@
 - **Server**: Node.js, Express, TypeScript, Zod, Helmet, Express Rate Limit, CORS
 - **AI / LLM**: Google Gemini API (`gemini-2.0-flash`) via `@google/generative-ai`
 - **Atmospheric Data**: Open-Meteo Air Quality API (Global, Keyless, CC-BY 4.0)
-- **Testing**: Vitest, Supertest (100% deterministic tests with 90/90 passing)
+- **Testing**: Vitest, Supertest (100% deterministic tests with 92/92 passing)
 
 ---
 
@@ -75,7 +75,7 @@ npm run install --workspace=client
 ```bash
 npm test
 ```
-*Runs all 90 unit and integration tests across CPCB AQI breakpoints, CO₂ calculations, Zod validation, and API routes.*
+*Runs all 92 unit and integration tests across CPCB AQI breakpoints, CO₂ calculations, Zod validation, and API routes.*
 
 ### 5. Start the Application
 

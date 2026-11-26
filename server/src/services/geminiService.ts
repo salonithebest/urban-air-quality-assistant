@@ -45,6 +45,15 @@ function sanitizeErrorMessage(err: unknown): string {
   return "Unknown error during generative AI synthesis";
 }
 
+/**
+ * Extracts raw JSON substring from model output, stripping optional markdown codeblocks.
+ */
+export function extractJsonText(rawText: string): string {
+  const trimmed = rawText.trim();
+  const jsonBlockMatch = trimmed.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+  return jsonBlockMatch && jsonBlockMatch[1] ? jsonBlockMatch[1].trim() : trimmed;
+}
+
 export function sanitizePromptText(value: string | undefined | null, maxLength = 80): string {
   if (!value || typeof value !== "string") return "";
   return value
@@ -111,8 +120,17 @@ export async function generateAdviceWording(
 
   try {
     const genAI = new GoogleGenerativeAI(env.GEMINI_API_KEY);
+    const systemInstruction = `You are an expert, family-focused urban air quality and environmental health specialist tailored for Indian households.
+You provide highly concrete, supportive, non-prescriptive, time-slotted routines and indoor air quality recommendations.
+
+CRITICAL SAFETY & MEDICAL DIRECTIVE:
+1. Do NOT provide medication timing, dosage, or prescriptive medication instructions (e.g. NEVER say "pre-medicate 15 minutes before" or specify intervals). Always advise the user to consult their physician (e.g. "Ask your doctor whether you should use your rescue inhaler before outdoor exposure").
+2. Strictly ground output in the provided locality, CPCB AQI, dominant pollutant, and pre-computed deterministic CO₂ savings metrics.
+3. Output MUST be valid JSON adhering strictly to the requested schema.`;
+
     const model = genAI.getGenerativeModel({
       model: GEMINI_MODEL_NAME,
+      systemInstruction,
       generationConfig: {
         responseMimeType: "application/json",
         temperature: 0.2, // Low temperature for consistent factual advice
@@ -198,7 +216,7 @@ ${JSON.stringify(
 
     const result = await model.generateContent(prompt);
     const text = result.response.text();
-    const parsed = JSON.parse(text);
+    const parsed = JSON.parse(extractJsonText(text));
 
     const candidateResponse = {
       memberAdvice: parsed.memberAdvice ?? [],

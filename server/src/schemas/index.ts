@@ -71,7 +71,7 @@ export const AqiResponseSchema = z.object({
   prominentPollutant: PollutantIdSchema,
   pollutants: z.array(PollutantReadingSchema),
   timestamp: z.string().datetime(),
-  dataNote: z.literal(DATA_NOTE),
+  dataNote: z.string().min(1),
 });
 export type AqiResponse = z.infer<typeof AqiResponseSchema>;
 

@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   AirQualityQuerySchema,
   DATA_NOTE,
+  type AirQualityQuery,
   type AqiResponse,
 } from "../schemas/index.js";
 import { validateQuery } from "../middleware/validate.js";
@@ -26,11 +27,7 @@ router.get(
   validateQuery(AirQualityQuerySchema),
   async (req, res, next): Promise<void> => {
     try {
-      const queryData = (res.locals.validatedQuery ?? req.query) as unknown as {
-        lat: number;
-        lon: number;
-        city?: string;
-      };
+      const queryData = (res.locals.validatedQuery ?? req.query) as AirQualityQuery;
       const { lat, lon, city } = queryData;
 
       const cacheKey = `${lat.toFixed(4)},${lon.toFixed(4)}`;

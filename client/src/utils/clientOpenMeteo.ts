@@ -67,6 +67,6 @@ export async function fetchClientAqi(
     prominentPollutant: calculated.prominentPollutant,
     pollutants: calculated.readings,
     timestamp: c.time ?? new Date().toISOString(),
-    dataNote: "Live telemetry from Open-Meteo Copernicus & CPCB linear interpolation standard.",
+    dataNote: "Estimated AQI from model data (hourly) — not an official CPCB reading.",
   };
 }

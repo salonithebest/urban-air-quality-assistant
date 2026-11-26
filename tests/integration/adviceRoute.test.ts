@@ -218,4 +218,9 @@ describe("POST /api/advice", () => {
     const res = await request(app).post("/api/advice").send(emptyProfilePayload);
     expect(res.status).toBe(400); // Caught cleanly by schema validation
   });
+
+  it("extractJsonText strips markdown fences from raw LLM responses", () => {
+    const raw = "```json\n{\"memberAdvice\": []}\n```";
+    expect(geminiService.extractJsonText(raw)).toBe("{\"memberAdvice\": []}");
+  });
 });

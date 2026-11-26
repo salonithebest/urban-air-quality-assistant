@@ -24,6 +24,9 @@ import type {
   PollutantId,
   PollutantReading,
 } from "../schemas/index.js";
+import { InsufficientDataError } from "../errors.js";
+
+export { InsufficientDataError };
 
 // ---------------------------------------------------------------------------
 // Breakpoint tables
@@ -173,14 +176,11 @@ export interface AqiResult {
   readings: PollutantReading[];
 }
 
-import { InsufficientDataError } from "../errors.js";
-export { InsufficientDataError };
-
 /**
  * Compute the overall CPCB AQI from an array of raw pollutant concentrations.
  *
  * Throws InsufficientDataError if the minimum data rule is not satisfied:
- *   - At least 3 pollutants must have non-null concentrations
+ *   - At least 3 unique criteria pollutants must have non-null concentrations
  *   - At least one must be PM₂.₅ or PM₁₀
  */
 export function computeAqi(rawConcentrations: RawConcentration[]): AqiResult {
@@ -190,16 +190,15 @@ export function computeAqi(rawConcentrations: RawConcentration[]): AqiResult {
       r.concentration !== null && r.concentration >= 0
   );
 
-  // Minimum data rule
-  const hasPM = valid.some(
-    (r) => r.pollutant === "pm2_5" || r.pollutant === "pm10"
-  );
+  // CPCB Minimum unique pollutant rule: at least 3 distinct pollutants, one of which must be PM
+  const uniquePollutants = new Set(valid.map((r) => r.pollutant));
+  const hasPM = uniquePollutants.has("pm2_5") || uniquePollutants.has("pm10");
 
-  if (valid.length < 3 || !hasPM) {
+  if (uniquePollutants.size < 3 || !hasPM) {
     throw new InsufficientDataError(
-      `CPCB minimum data rule not met: ${valid.length} valid pollutant(s) available` +
+      `CPCB minimum data rule not met: ${uniquePollutants.size} unique valid pollutant(s) available` +
         (hasPM ? "" : ", and neither PM₂.₅ nor PM₁₀ is available") +
-        ". Need at least 3 pollutants including one PM."
+        ". Need at least 3 unique pollutants including one PM."
     );
   }
 
