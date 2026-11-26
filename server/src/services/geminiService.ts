@@ -15,10 +15,11 @@
 
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { env } from "../config/env.js";
-import type {
-  AdviceRequest,
-  AdviceResponse,
-  MemberAdvice,
+import {
+  AdviceResponseSchema,
+  type AdviceRequest,
+  type AdviceResponse,
+  type MemberAdvice,
 } from "../schemas/index.js";
 
 // Single constant for model name so it can be swapped instantly if needed
@@ -55,10 +56,24 @@ export function sanitizePromptText(value: string | undefined | null, maxLength =
     .slice(0, maxLength);
 }
 
-function computeCacheKey(req: AdviceRequest): string {
-  const roles = (req.familyProfile?.members || []).map((m) => m.role).sort().join(",");
-  const routines = (req.routineChoices || []).map((r) => r.activityType).sort().join(",");
-  return `${req.aqiSnapshot.city}:${req.aqiSnapshot.category}:${req.aqiSnapshot.aqi}:${roles}:${routines}`;
+export function computeCacheKey(req: AdviceRequest): string {
+  const members = (req.familyProfile?.members || [])
+    .map((m) => `${m.id}|${m.name.trim().toLowerCase()}|${m.role}`)
+    .sort()
+    .join(";");
+
+  const routines = (req.routineChoices || [])
+    .map((r) => `${r.activityType}|${r.durationMinutes}|${r.distanceKm ?? 0}`)
+    .sort()
+    .join(";");
+
+  const indoor = req.indoorContext
+    ? `${req.indoorContext.hasAirPurifier ? 1 : 0}|${req.indoorContext.hasPlants ? 1 : 0}|${req.indoorContext.ventilationType}`
+    : "default";
+
+  const aqi = `${req.aqiSnapshot.city.trim().toLowerCase()}|${req.aqiSnapshot.category}|${req.aqiSnapshot.aqi}|${req.aqiSnapshot.prominentPollutant}`;
+
+  return `${aqi}#${members}#${routines}#${indoor}`;
 }
 
 export async function generateAdviceWording(
@@ -185,13 +200,27 @@ ${JSON.stringify(
     const text = result.response.text();
     const parsed = JSON.parse(text);
 
-    const adviceResponse: AdviceResponse = {
+    const candidateResponse = {
       memberAdvice: parsed.memberAdvice ?? [],
       routineSuggestions: parsed.routineSuggestions ?? [],
       indoorTips: parsed.indoorTips ?? [],
       co2Estimate,
       generatedAt: new Date().toISOString(),
     };
+
+    // Strict runtime schema validation against LLM output anomalies
+    const validationResult = AdviceResponseSchema.safeParse(candidateResponse);
+    if (!validationResult.success) {
+      if (process.env.NODE_ENV === "development") {
+        console.warn(
+          "Gemini output failed AdviceResponseSchema validation. Falling back to deterministic engine:",
+          validationResult.error.message
+        );
+      }
+      return generateDeterministicFallback(request, co2Estimate);
+    }
+
+    const adviceResponse: AdviceResponse = validationResult.data;
 
     adviceCache.set(cacheKey, { data: adviceResponse, expiresAt: now + ADVICE_CACHE_TTL_MS });
     return adviceResponse;
@@ -230,11 +259,11 @@ export function generateDeterministicFallback(
 
     switch (m.role) {
       case "infant":
-        healthImpact = `Infants inhale 2–3× more air per kg of body weight than adults. At AQI ${aqi} dominated by ${prominentDisplay}, micro-particles bypass under-developed nasal cilia and penetrate alveolar membranes, elevating wheezing and airway inflammation risks.`;
+        healthImpact = `Infants inhale 2–3× more air per kg of body weight than adults. At AQI ${aqi} dominated by ${prominentDisplay}, micro-particles bypass under-developed nasal filtration, elevating airway sensitivity and respiratory discomfort.`;
         personalTips.push(
-          `Eliminate outdoor stroller walks between 6:00 AM – 9:30 AM in ${city} when thermal inversion traps heavy tailpipe pollutants near ground level.`,
-          "Operate a true-HEPA purifier in the nursery; keep room doors closed during peak traffic hours.",
-          "Perform regular gentle nasal saline moistening to prevent particulate dry-crusting in nasal passages."
+          `Avoid outdoor stroller walks during morning inversion windows in ${city} when ground-level particle concentrations peak.`,
+          "Operate a true-HEPA purifier in the nursery; keep room doors and windows closed during peak traffic hours.",
+          "Maintain comfortable nursery humidity and consult your pediatrician if nasal irritation or congestion develops."
         );
         break;
       case "child":
@@ -242,7 +271,7 @@ export function generateDeterministicFallback(
         personalTips.push(
           "Reschedule strenuous outdoor sports or playground sessions from morning hours to 2:00 PM – 4:30 PM when solar convective mixing lowers ground pollutant density.",
           "Ensure an N95 or well-sealed particulate mask during morning school commutes via open auto-rickshaws or school buses.",
-          "Encourage warm hydration and vitamin C rich citrus fruits to boost mucosal defense against airway oxidants."
+          "Encourage warm hydration and balanced nutrition to support mucosal defenses against airway oxidants."
         );
         break;
       case "senior":
@@ -250,7 +279,7 @@ export function generateDeterministicFallback(
         personalTips.push(
           `Shift morning garden walks in ${city} entirely to indoor mobility/yoga sessions until ambient AQI drops below 100.`,
           "Monitor morning resting pulse and blood pressure; report sudden chest tightness or breathlessness immediately.",
-          "Keep essential bronchodilator sprays or cardiovascular medications on the bedside table for immediate reach."
+          "Keep your doctor-prescribed medications easily accessible; consult your physician if you experience any breathing changes."
         );
         break;
       case "asthmatic":
@@ -265,16 +294,16 @@ export function generateDeterministicFallback(
         healthImpact = `At AQI ${aqi}, inhalation of ${prominentDisplay} triggers endothelial dysfunction and arterial vasoconstriction, demanding higher myocardial oxygenation while reducing coronary perfusion.`;
         personalTips.push(
           "Avoid brisk uphill walking, heavy lifting, or strenuous outdoor chores that elevate heart rate above 100 bpm in polluted air.",
-          "Keep emergency nitrates/prescribed cardiac medication on hand at all times.",
+          "Keep prescribed emergency cardiac medications within immediate reach as advised by your cardiologist.",
           "Stay in sealed, air-filtered indoor rooms; avoid open-window vehicular commutes during rush hour."
         );
         break;
       case "pregnant":
-        healthImpact = `Fine particulates (${prominentDisplay}) at AQI ${aqi} cross alveolar-capillary barriers into maternal circulation, causing mild placental hypoperfusion and increased maternal systemic inflammation.`;
+        healthImpact = `Fine particulates (${prominentDisplay}) at AQI ${aqi} can elevate maternal airway sensitivity and systemic inflammatory markers.`;
         personalTips.push(
           `Avoid traveling along heavily congested freight or diesel corridors in ${city}.`,
           "Maximize time spent in purified indoor rooms with controlled HEPA filtration.",
-          "Maintain optimal maternal hydration and consume antioxidant-rich diet (spinach, nuts, amla) to counter oxidative stress."
+          "Maintain optimal maternal hydration and consume an antioxidant-rich diet to counter environmental oxidative stress."
         );
         break;
       default:

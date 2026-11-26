@@ -47,10 +47,10 @@ export function generateClientFallbackAdvice(
         return {
           memberId: member.id,
           memberName: member.name,
-          healthImpact: `At AQI ${aqi} in ${city}, elevated ${prominentDisplay} triggers systemic vascular inflammation, arterial stiffness, and accelerated myocardial workload in elderly citizens.`,
+          healthImpact: `Senior cardiovascular elasticity and pulmonary reserves decline naturally. At AQI ${aqi} in ${city}, ${prominentDisplay} induces systemic vascular oxidative stress and elevates blood pressure.`,
           personalTips: [
-            `Shift morning walking routines strictly indoors or delay until after 11:30 AM once ambient ground inversion dissipates.`,
-            `Keep prescribed antihypertensive and bronchodilator medications within immediate bedside reach.`,
+            `Shift morning walking routines strictly indoors until ambient ground inversion dissipates.`,
+            `Keep your doctor-prescribed medications easily accessible; consult your physician if you experience any breathing changes.`,
             `Operate indoor HEPA air purification continuously with closed windows during night and early morning hours.`,
           ],
         };
@@ -58,11 +58,11 @@ export function generateClientFallbackAdvice(
         return {
           memberId: member.id,
           memberName: member.name,
-          healthImpact: `Systemic trans-placental particulate translocation poses microvascular perfusion risks during pregnancy under ${city}'s AQI ${aqi} (${category}) conditions.`,
+          healthImpact: `Fine particulates (${prominentDisplay}) at AQI ${aqi} (${category}) can elevate maternal airway sensitivity and systemic inflammatory markers.`,
           personalTips: [
-            `Strictly avoid busy arterial roadside transit and congested junctions during peak rush hours (8:00–11:00 AM, 6:00–9:00 PM).`,
+            `Strictly avoid busy arterial roadside transit and congested junctions during peak rush hours.`,
             `Utilize high-filtration N95 respirators whenever stepping outside for antenatal clinic visits.`,
-            `Ensure optimal maternal hydration and consume antioxidant-dense whole foods to mitigate systemic oxidative stress.`,
+            `Maintain optimal maternal hydration and consume antioxidant-dense whole foods to mitigate systemic oxidative stress.`,
           ],
         };
       case "asthmatic":

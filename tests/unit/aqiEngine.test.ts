@@ -32,6 +32,17 @@ describe("computeSubIndex – PM₂.₅", () => {
     expect(computeSubIndex("pm2_5", 45)).toBe(75);
   });
 
+  it("handles decimal concentrations across breakpoint boundaries without falling to 500", () => {
+    // 30.2 rounds to 30 (Good upper bound → 50)
+    expect(computeSubIndex("pm2_5", 30.2)).toBe(50);
+    // 30.5 rounds to 31 (Satisfactory lower bound → 51)
+    expect(computeSubIndex("pm2_5", 30.5)).toBe(51);
+    // 60.4 rounds to 60 (Satisfactory upper bound → 100)
+    expect(computeSubIndex("pm2_5", 60.4)).toBe(100);
+    // 60.6 rounds to 61 (Moderately Polluted lower bound → 101)
+    expect(computeSubIndex("pm2_5", 60.6)).toBe(101);
+  });
+
   it("caps at 500 for concentration above Severe threshold", () => {
     expect(computeSubIndex("pm2_5", 999)).toBe(500);
   });
@@ -108,6 +119,13 @@ describe("computeSubIndex – CO (mg/m³, NOT µg/m³)", () => {
 
   it("returns 100 at CO = 2.0 mg/m³ (upper bound of Satisfactory)", () => {
     expect(computeSubIndex("co", 2.0)).toBe(100);
+  });
+
+  it("handles decimal CO readings at breakpoint boundaries", () => {
+    // 1.04 rounds to 1.0 mg/m³ (Good upper bound → 50)
+    expect(computeSubIndex("co", 1.04)).toBe(50);
+    // 1.06 rounds to 1.1 mg/m³ (Satisfactory lower bound → 51)
+    expect(computeSubIndex("co", 1.06)).toBe(51);
   });
 
   it("caps at 500 above Severe threshold", () => {

@@ -7,7 +7,6 @@ import { Router } from "express";
 import { AdviceRequestSchema, type AdviceRequest } from "../schemas/index.js";
 import { validateBody } from "../middleware/validate.js";
 import { adviceRateLimiter } from "../middleware/rateLimiter.js";
-import { authenticate } from "../middleware/auth.js";
 import { estimateCo2 } from "../services/co2Engine.js";
 import { generateAdviceWording } from "../services/geminiService.js";
 
@@ -29,7 +28,6 @@ function getCachedCo2(routineChoices: AdviceRequest["routineChoices"]) {
 router.post(
   "/advice",
   adviceRateLimiter,
-  authenticate,
   validateBody(AdviceRequestSchema),
   async (req, res, next): Promise<void> => {
     try {

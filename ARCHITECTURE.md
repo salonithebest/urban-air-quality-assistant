@@ -26,12 +26,12 @@ flowchart TD
     subgraph Server ["Server (Node.js + Express + TypeScript)"]
         AqiEngine["CPCB Linear Breakpoint Sub-Index Engine"]
         Co2Calc["India GHG & USDA Carbon Engine"]
-        GeminiService["Google Gemini 1.5 Grounded LLM Pipeline"]
+        GeminiService["Google Gemini 2.0 Flash Grounded LLM Pipeline"]
         MedicalEngine["Deterministic Clinical Rules Engine (Server Fallback)"]
     end
 
     subgraph ExternalAI ["Google Cloud AI Infrastructure"]
-        GeminiAPI["Google Gemini 1.5 Flash (@google/genai)"]
+        GeminiAPI["Google Gemini 2.0 Flash (@google/genai)"]
     end
 
     CitySelect -->|Query Lat/Lon| OpenMeteo
@@ -55,7 +55,7 @@ A core engineering principle of the Urban Air Quality Assistant is **strict sepa
 |---|---|---|:---:|
 | **CPCB AQI Engine** | Linear interpolation across 6 pollutants, prominent driver identification, minimum data rule validation ($\ge 3$ pollutants with $\ge 1$ PM) | Pure TypeScript AST (`aqiEngine.ts`) | **100% Yes** |
 | **Carbon Engine** | Daily & annual $CO_2$ footprint, WFH $0\text{ km}$ distance lock, USDA tree-years sequestration ($21\text{ kg } CO_2/\text{tree-year}$) | Mathematical model (`co2Engine.ts`, `co2Calculator.ts`) | **100% Yes** |
-| **Generative AI** | Age-bracketed, empathetic health phrasing, tailored commute buffers, and lifestyle mitigation | Google Gemini 1.5 with Zod schema validation | **Zero Math Hallucination** |
+| **Generative AI** | Age-bracketed, empathetic health phrasing, tailored commute buffers, and lifestyle mitigation | Google Gemini 2.0 Flash with Zod schema validation | **Zero Math Hallucination** |
 | **Fallback Engine** | Instant zero-downtime health guidance during network loss or quota exhaustion | Structured medical rulebook (`geminiService.ts`, `clientFallbackAdvice.ts`) | **100% Yes** |
 
 ---
@@ -80,7 +80,7 @@ Where:
 sequenceDiagram
     participant User as Client Browser
     participant Express as Backend Server
-    participant Gemini as Google Gemini 1.5
+    participant Gemini as Google Gemini 2.0 Flash
     participant Fallback as Clinical Rules Engine
 
     User->>Express: POST /api/advice (Snapshot Payload)

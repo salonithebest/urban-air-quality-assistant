@@ -183,4 +183,39 @@ describe("POST /api/advice", () => {
     );
     expect(spy).toHaveBeenCalled();
   });
+
+  it("differentiates cache keys when member names, IDs, or routines differ (prevents cache collisions)", () => {
+    const payload1 = { ...validPayload };
+    const payload2 = {
+      ...validPayload,
+      familyProfile: {
+        members: [
+          {
+            id: "3fa85f64-5717-4562-b3fc-2c963f66afa8",
+            name: "Diya",
+            role: "child",
+          },
+          {
+            id: "3fa85f64-5717-4562-b3fc-2c963f66afa9",
+            name: "Dada ji",
+            role: "senior",
+          },
+        ],
+      },
+    };
+
+    const key1 = geminiService.computeCacheKey(payload1 as any);
+    const key2 = geminiService.computeCacheKey(payload2 as any);
+
+    expect(key1).not.toBe(key2);
+  });
+
+  it("handles empty members list safely", async () => {
+    const emptyProfilePayload = {
+      ...validPayload,
+      familyProfile: { members: [] },
+    };
+    const res = await request(app).post("/api/advice").send(emptyProfilePayload);
+    expect(res.status).toBe(400); // Caught cleanly by schema validation
+  });
 });

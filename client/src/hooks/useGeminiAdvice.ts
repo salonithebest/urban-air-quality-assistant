@@ -41,10 +41,7 @@ export function useGeminiAdvice() {
 
         const res = await fetch("/api/advice", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer guest-client-session",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
         });
 

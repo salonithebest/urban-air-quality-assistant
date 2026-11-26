@@ -15,7 +15,6 @@ declare global {
     interface Locals {
       validatedQuery?: unknown;
       validatedBody?: unknown;
-      user?: { id: string; role: string };
     }
   }
 }

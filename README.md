@@ -34,7 +34,7 @@
 - **Server**: Node.js, Express, TypeScript, Zod, Helmet, Express Rate Limit, CORS
 - **AI / LLM**: Google Gemini API (`gemini-2.0-flash`) via `@google/generative-ai`
 - **Atmospheric Data**: Open-Meteo Air Quality API (Global, Keyless, CC-BY 4.0)
-- **Testing**: Vitest, Supertest (100% deterministic tests with 72/72 passing)
+- **Testing**: Vitest, Supertest (100% deterministic tests with 90/90 passing)
 
 ---
 
@@ -75,7 +75,7 @@ npm run install --workspace=client
 ```bash
 npm test
 ```
-*Runs all 72 unit and integration tests across CPCB AQI breakpoints, CO₂ calculations, Zod validation, and API routes.*
+*Runs all 90 unit and integration tests across CPCB AQI breakpoints, CO₂ calculations, Zod validation, and API routes.*
 
 ### 5. Start the Application
 
@@ -121,6 +121,8 @@ All transport emission factors are stored centrally in `server/src/config/emissi
    Official CPCB guidelines calculate sub-indices based on 24-hour averages for particulates/gases and 8-hour rolling averages for $\text{O}_3$/$\text{CO}$. To deliver real-time responsiveness without multi-call historical roundtrips, this application calculates estimated AQI from the latest hourly model reading, explicitly disclosed on all output cards.
 3. **Ammonia ($\text{NH}_3$) Availability**:
    Open-Meteo does not provide uniform continuous coverage for Ammonia across all Indian coordinates; therefore, $\text{NH}_3$ is excluded while satisfying the CPCB requirement of at least 3 valid monitored criteria pollutants including $\text{PM}_{2.5}$ or $\text{PM}_{10}$.
+4. **No User Authentication & In-Memory Rate Limiting**:
+   The application intentionally operates without user authentication (no mandatory API keys, JWT, or database sessions) to support frictionless public evaluation and privacy-first client-side profiling. To protect upstream LLM quota from abuse without session state, `/api/advice` is protected via per-IP in-memory rate limiting (5 requests per 1 minute) coupled with deterministic response caching.
 
 ---
 

@@ -53,25 +53,3 @@ describe("Security Headers & Error Masking", () => {
     expect(res.status).toBe(200);
   });
 });
-
-describe("Authentication & Authorization Middleware", () => {
-  it("authenticates requests with Authorization Bearer header", async () => {
-    const res = await request(app)
-      .post("/api/advice")
-      .set("Authorization", "Bearer test-jwt-token")
-      .send({ invalid: "body" });
-    // Reaches validation layer because authentication succeeded
-    expect(res.status).toBe(400);
-    expect(res.body.error).toBe("Validation failed");
-  });
-
-  it("authenticates requests with x-api-key header", async () => {
-    const res = await request(app)
-      .post("/api/advice")
-      .set("x-api-key", "test-api-key-12345")
-      .send({ invalid: "body" });
-    // Reaches validation layer because authentication succeeded
-    expect(res.status).toBe(400);
-    expect(res.body.error).toBe("Validation failed");
-  });
-});

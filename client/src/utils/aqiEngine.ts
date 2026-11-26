@@ -120,20 +120,33 @@ export function computeSubIndex(
     );
   }
 
+  // Consistent with CPCB NAQI reporting methodology:
+  // Concentrations are rounded to standard reporting resolution prior to breakpoint lookup:
+  // CO is rounded to 1 decimal place (mg/m³), while particulate and other gaseous pollutants are rounded to nearest integer (µg/m³).
+  const roundedConcentration =
+    pollutant === "co"
+      ? Math.round(concentration * 10) / 10
+      : Math.round(concentration);
+
   const rows = BREAKPOINTS[pollutant];
 
-  for (const [cLo, cHi, iLo, iHi] of rows) {
-    if (concentration >= cLo && concentration <= cHi) {
+  for (let idx = 0; idx < rows.length; idx++) {
+    const row = rows[idx];
+    if (!row) continue;
+    const [cLo, cHi, iLo, iHi] = row;
+    if (roundedConcentration <= cHi || idx === rows.length - 1) {
       // Handle the Infinity upper bound (Severe category): cap sub-index at 500
       if (cHi === Infinity) return 500;
 
-      // Linear interpolation
-      const subIndex = ((iHi - iLo) / (cHi - cLo)) * (concentration - cLo) + iLo;
+      // Clamp concentration to bracket bounds to prevent out-of-range interpolation
+      const effectiveConc = Math.max(cLo, Math.min(cHi, roundedConcentration));
+
+      // Linear interpolation between breakpoints
+      const subIndex = ((iHi - iLo) / (cHi - cLo)) * (effectiveConc - cLo) + iLo;
       return Math.min(500, Math.round(subIndex));
     }
   }
 
-  // Should never reach here for valid non-negative input, but be safe
   return 500;
 }
 
